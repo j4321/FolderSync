@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="38"
+   height="28"
+   viewBox="0 0 38 28.000001"
+   id="svg3389"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   inkscape:export-filename="/media/DATA/Mes_documents/python/FolderSync/tristate.png"
+   inkscape:export-xdpi="45"
+   inkscape:export-ydpi="45">
+  <defs
+     id="defs3391">
+    <linearGradient
+       id="c"
+       y2="65.095001"
+       xlink:href="#a"
+       gradientUnits="userSpaceOnUse"
+       x2="18.434999"
+       gradientTransform="matrix(1.8929,0,0,1.8929,-28.940087,904.57755)"
+       y1="70.777"
+       x1="23.486" />
+    <linearGradient
+       id="a">
+      <stop
+         stop-color="#fff"
+         offset="0"
+         id="stop7" />
+      <stop
+         stop-color="#b3b3b3"
+         offset="1"
+         id="stop9" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="12.049697"
+     inkscape:cy="13.64167"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1366"
+     inkscape:window-height="719"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       position="-32.135478,14.015867"
+       orientation="0,1"
+       id="guide3429" />
+    <sodipodi:guide
+       position="2.5,35.535716"
+       orientation="1,0"
+       id="guide3433" />
+    <sodipodi:guide
+       position="15.152288,27.400389"
+       orientation="1,0"
+       id="guide3450" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata3394">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-1024.3621)">
+    <rect
+       height="23.499001"
+       width="23.499001"
+       y="1026.5625"
+       x="3.5288815"
+       id="rect33"
+       style="fill:url(#c);stroke:#1c5180;stroke-width:2.00699997"
+       inkscape:export-filename="/media/DATA/Mes_documents/python/FolderSync/checked.png"
+       inkscape:export-xdpi="49.400139"
+       inkscape:export-ydpi="49.400139" />
+  </g>
+</svg>
