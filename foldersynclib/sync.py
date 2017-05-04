@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-# -*- coding:Utf-8 -*-
+# -*- coding:utf-8 -*-
 """
 FolderSync - Folder synchronization software
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
@@ -35,7 +35,7 @@ from tkinter.messagebox import showerror, askokcancel, showwarning
 from foldersynclib.checkboxtreeview import CheckboxTreeview
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory
-from foldersynclib.constantes import IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON
+from foldersynclib.constantes import IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT
 from foldersynclib.constantes import IM_PREV, IM_SYNC, IM_EXPAND, IM_COLLAPSE
 from foldersynclib.constantes import LOG_COPIE, LOG_SUPP, save_config
 from foldersynclib.confirmation import Confirmation
@@ -54,6 +54,7 @@ class Sync(Tk):
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
 
+        self.img_about = PhotoImage(file=IM_ABOUT)
         self.img_open = PhotoImage(file=IM_OPEN)
         self.img_plus = PhotoImage(file=IM_PLUS)
         self.img_moins = PhotoImage(file=IM_MOINS)
@@ -155,15 +156,14 @@ class Sync(Tk):
                               command=self.list_files_to_sync)
         self.menu.add_command(image=self.img_sync, compound="center",
                               state="disabled", command=self.synchronise)
-        self.menu.add_command(label="About", command=lambda: About(self))
+        self.menu.add_command(image=self.img_about, compound="center", 
+                              command=lambda: About(self))
 
 #        # sélection chemins
         frame_paths= Frame(self)
         frame_paths.grid(row=0, sticky="ew", pady=(10,0))
         frame_paths.columnconfigure(0, weight=1)
         frame_paths.columnconfigure(1, weight=1)
-#        self.style.configure("f1.TFrame", background="red")
-#        self.style.configure("f2.TFrame", background="blue")
         f1 = Frame(frame_paths, height=26)
         f2 = Frame(frame_paths, height=26)
         f1.grid(row=0, column=0, sticky="ew")

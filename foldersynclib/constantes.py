@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Constants
 """
 
-
-VERSION = "1.0.7"
+import pkg_resources
+VERSION = pkg_resources.require("FolderSync")[0].version
 
 import os
 from sys import platform
@@ -74,6 +74,7 @@ else:
 # Images
 IMAGE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "images")
 IM_ICON = os.path.join(IMAGE_PATH, "icon.png")
+IM_ABOUT = os.path.join(IMAGE_PATH, "about.png")
 IM_COLLAPSE = os.path.join(IMAGE_PATH, "collapse_all.png")
 IM_EXPAND = os.path.join(IMAGE_PATH, "expand_all.png")
 IM_SYNC = os.path.join(IMAGE_PATH, "sync2.png")
