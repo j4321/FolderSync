@@ -156,7 +156,7 @@ class Sync(Tk):
                               command=self.list_files_to_sync)
         self.menu.add_command(image=self.img_sync, compound="center",
                               state="disabled", command=self.synchronise)
-        self.menu.add_command(image=self.img_about, compound="center", 
+        self.menu.add_command(image=self.img_about, compound="center",
                               command=lambda: About(self))
 
 #        # sélection chemins
@@ -612,11 +612,11 @@ class Sync(Tk):
         """ toggle the state (normal/disabled) of key elements of the GUI """
         if "disabled" in self.b_open_orig.state():
             state = "!disabled"
-            for i in range(6):
+            for i in range(7):
                 self.menu.entryconfigure(i, state="normal")
         else:
             state = "disabled"
-            for i in range(6):
+            for i in range(7):
                 self.menu.entryconfigure(i, state="disabled")
         self.tree_copie.state((state,))
         self.tree_supp.state((state,))

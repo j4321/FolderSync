@@ -136,7 +136,7 @@ def askdirectories(initialdir, title="Séléctionner", **options):
             args = ["zenity", "--file-selection",  "--filename", initialdir,
                     "--directory", "--multiple", "--title", title]
             folder = check_output(args).decode("utf-8").strip()
-            return folder
+            return folder.split('|')
         except CalledProcessError:
             return ""
         except Exception:
@@ -157,8 +157,8 @@ def askfiles(initialdir, title="Séléctionner", **options):
         try:
             args = ["zenity", "--file-selection",  "--filename", initialdir,
                     "--multiple", "--title", title]
-            folder = check_output(args).decode("utf-8").strip()
-            return folder
+            files = check_output(args).decode("utf-8").strip()
+            return files.split('|')
         except CalledProcessError:
             return ""
         except Exception:

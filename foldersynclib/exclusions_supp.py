@@ -93,7 +93,7 @@ class ExclusionsSupp(Toplevel):
         except TclError:
             # no item selected
             path = self.last_path
-        docs = askfiles(path).split("|")
+        docs = askfiles(path)
         if docs[0]:
             for d in docs:
                 d = d.replace(" ", "\ ")
@@ -108,7 +108,7 @@ class ExclusionsSupp(Toplevel):
         except TclError:
             # no item selected
             path = self.last_path
-        dirs = askdirectories(path).split("|")
+        dirs = askdirectories(path)
         if dirs[0]:
             for d in dirs:
                 d = d.replace(" ", "\ ")

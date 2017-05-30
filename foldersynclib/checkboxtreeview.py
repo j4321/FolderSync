@@ -33,10 +33,11 @@ class CheckboxTreeview(Treeview):
     """
 
     def __init__(self, master=None, **kw):
-        Treeview.__init__(self, master, **kw)
+        Treeview.__init__(self, master, class_="CheckboxTreeview",
+                          style='Checkbox.Treeview', **kw)
         # style (make a noticeable disabled style)
         style = Style(self)
-        style.map("Treeview", fieldbackground=[("disabled", '#E6E6E6')],
+        style.map("Checkbox.Treeview", fieldbackground=[("disabled", '#E6E6E6')],
                   background=[("disabled", '#E6E6E6')])
         # checkboxes are implemented with pictures
         self.im_checked = PhotoImage(file=IM_CHECKED)
