@@ -33,16 +33,17 @@ class CheckboxTreeview(Treeview):
     """
 
     def __init__(self, master=None, **kw):
-        Treeview.__init__(self, master, class_="CheckboxTreeview",
-                          style='Checkbox.Treeview', **kw)
+        Treeview.__init__(self, master, style='Checkbox.Treeview', **kw)
         # style (make a noticeable disabled style)
         style = Style(self)
-        style.map("Checkbox.Treeview", fieldbackground=[("disabled", '#E6E6E6')],
+        style.map("Checkbox.Treeview",
+                  fieldbackground=[("disabled", '#E6E6E6')],
+                  foreground=[("disabled", 'gray40')],
                   background=[("disabled", '#E6E6E6')])
         # checkboxes are implemented with pictures
-        self.im_checked = PhotoImage(file=IM_CHECKED)
-        self.im_unchecked = PhotoImage(file=IM_UNCHECKED)
-        self.im_tristate = PhotoImage(file=IM_TRISTATE)
+        self.im_checked = PhotoImage(file=IM_CHECKED, master=self)
+        self.im_unchecked = PhotoImage(file=IM_UNCHECKED, master=self)
+        self.im_tristate = PhotoImage(file=IM_TRISTATE, master=self)
         self.tag_configure("unchecked", image=self.im_unchecked)
         self.tag_configure("tristate", image=self.im_tristate)
         self.tag_configure("checked", image=self.im_checked)
@@ -182,6 +183,3 @@ class CheckboxTreeview(Treeview):
             else:
                 self.uncheck_descendant(item)
                 self.uncheck_ancestor(item)
-
-
-
