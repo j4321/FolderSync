@@ -54,14 +54,14 @@ class Sync(Tk):
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.img_about = PhotoImage(file=IM_ABOUT)
-        self.img_open = PhotoImage(file=IM_OPEN)
-        self.img_plus = PhotoImage(file=IM_PLUS)
-        self.img_moins = PhotoImage(file=IM_MOINS)
-        self.img_sync = PhotoImage(file=IM_SYNC)
-        self.img_prev = PhotoImage(file=IM_PREV)
-        self.img_expand = PhotoImage(file=IM_EXPAND)
-        self.img_collapse = PhotoImage(file=IM_COLLAPSE)
+        self.img_about = PhotoImage(master=self, file=IM_ABOUT)
+        self.img_open = PhotoImage(master=self, file=IM_OPEN)
+        self.img_plus = PhotoImage(master=self, file=IM_PLUS)
+        self.img_moins = PhotoImage(master=self, file=IM_MOINS)
+        self.img_sync = PhotoImage(master=self, file=IM_SYNC)
+        self.img_prev = PhotoImage(master=self, file=IM_PREV)
+        self.img_expand = PhotoImage(master=self, file=IM_EXPAND)
+        self.img_collapse = PhotoImage(master=self, file=IM_COLLAPSE)
 
         self.original = ""
         self.sauvegarde = ""
@@ -136,8 +136,8 @@ class Sync(Tk):
 
         ## accès aux fichiers log
         menu_log = Menu(self.menu, tearoff=False)
-        menu_log.add_command(label="Copie", command=lambda: self.open_log_copie)
-        menu_log.add_command(label="Suppression", command=lambda: self.open_log_suppression)
+        menu_log.add_command(label="Copie", command=self.open_log_copie)
+        menu_log.add_command(label="Suppression", command=self.open_log_suppression)
 
         ## paramètres, préférences
         menu_params = Menu(self.menu, tearoff=False)

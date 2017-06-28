@@ -34,10 +34,17 @@ PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
 i = 0
 LOG_COPIE = os.path.join(PATH, "copie%i.log")
 LOG_SUPP = os.path.join(PATH, "suppression%i.log")
+
 while os.path.exists(LOG_COPIE % i) or os.path.exists(LOG_SUPP % i):
     i += 1
 LOG_COPIE = LOG_COPIE % i
 LOG_SUPP = LOG_SUPP % i
+
+with open(LOG_COPIE, "w") as log_copie:
+    log_copie.write("###  foldersync : log de la copie  ###\n\n")
+
+with open(LOG_SUPP, "w") as log_supp:
+    log_supp.write("###  foldersync : log de la suppression  ###\n\n")
 
 PATH_CONFIG = os.path.join(PATH, "foldersync.ini")
 CONFIG = ConfigParser()
