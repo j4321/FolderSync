@@ -105,7 +105,7 @@ if platform != "nt":
             ZENITY = True
 
 try:
-    import tkFileBrowser as tkfb
+    import tkfilebrowser as tkfb
 except ImportError:
     tkfb = False
 
