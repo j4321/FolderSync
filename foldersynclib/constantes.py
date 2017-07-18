@@ -22,7 +22,7 @@ Constants
 
 import pkg_resources
 VERSION = pkg_resources.require("FolderSync")[0].version
-
+import logging
 import os
 from sys import platform
 from configparser import ConfigParser
@@ -31,20 +31,26 @@ from subprocess import check_output, CalledProcessError
 
 # fichier de config
 PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
-i = 0
+
+PID_FILE = "/tmp/foldersync%i.pid"
+
 LOG_COPIE = os.path.join(PATH, "copie%i.log")
 LOG_SUPP = os.path.join(PATH, "suppression%i.log")
 
-while os.path.exists(LOG_COPIE % i) or os.path.exists(LOG_SUPP % i):
-    i += 1
-LOG_COPIE = LOG_COPIE % i
-LOG_SUPP = LOG_SUPP % i
 
-with open(LOG_COPIE, "w") as log_copie:
-    log_copie.write("###  foldersync : log de la copie  ###\n\n")
+def setup_logger(name, log_file, level=logging.INFO,
+                 formatter=logging.Formatter('%(levelname)s %(message)s')):
+    """Setup a logger and return it."""
 
-with open(LOG_SUPP, "w") as log_supp:
-    log_supp.write("###  foldersync : log de la suppression  ###\n\n")
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+
+    return logger
+
 
 PATH_CONFIG = os.path.join(PATH, "foldersync.ini")
 CONFIG = ConfigParser()

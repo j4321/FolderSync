@@ -34,3 +34,8 @@ finally:
         os.remove(LOG_COPIE)
     if os.path.exists(LOG_SUPP):
         os.remove(LOG_SUPP)
+    try:
+        sync.unlink()
+    except Exception:
+        pass
+
