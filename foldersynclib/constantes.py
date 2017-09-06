@@ -39,10 +39,10 @@ LOG_COPIE = os.path.join(PATH, "copie%i.log")
 LOG_SUPP = os.path.join(PATH, "suppression%i.log")
 
 
-def setup_logger(name, log_file, level=logging.INFO,
-                 formatter=logging.Formatter('%(levelname)s %(message)s')):
+def setup_logger(name, log_file, level=logging.INFO):
     """Setup a logger and return it."""
-
+    formatter=logging.Formatter('%(levelname)s %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S')
     handler = TimedRotatingFileHandler(log_file, when='midnight',
                                        interval=1, backupCount=5)
     handler.setFormatter(formatter)
