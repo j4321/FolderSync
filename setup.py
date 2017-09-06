@@ -6,7 +6,7 @@ from setuptools import setup
 files = ["images/*"]
 
 setup(name = "FolderSync",
-	  version = "1.0.7",
+	  version = "1.0.8",
 	  description = "Folder synchronisation software",
 	  author = "Juliette Monsel",
 	  author_email = "j_4321@protonmail.fr",

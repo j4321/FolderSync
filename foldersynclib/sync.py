@@ -621,6 +621,7 @@ class Sync(Tk):
                     self.b_expand_supp.state(("disabled", ))
                 if err:
                     showerror("Erreurs", "\n".join(err))
+                run(["notify-send", "-i", IM_ICON, "FolderSync", "Scan is finished."])
                 warnings = self.tree_copie.tag_has('warning')
                 if warnings:
                     showwarning("Attention", "Certains éléments à copier (en rouge) ne sont pas de même nature sur l'original et la sauvegarde")

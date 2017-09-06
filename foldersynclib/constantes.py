@@ -23,6 +23,7 @@ Constants
 import pkg_resources
 VERSION = pkg_resources.require("FolderSync")[0].version
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import os
 from sys import platform
 from configparser import ConfigParser
@@ -42,7 +43,8 @@ def setup_logger(name, log_file, level=logging.INFO,
                  formatter=logging.Formatter('%(levelname)s %(message)s')):
     """Setup a logger and return it."""
 
-    handler = logging.FileHandler(log_file)
+    handler = TimedRotatingFileHandler(log_file, when='midnight',
+                                       interval=1, backupCount=5)
     handler.setFormatter(formatter)
 
     logger = logging.getLogger(name)
