@@ -23,7 +23,7 @@ Main GUI
 # TODO: tester os.scandir
 
 from os.path import join, splitext, exists, isdir, islink, isfile, getmtime, abspath, commonpath
-from os import listdir, chdir, getpid, remove, unlink
+from os import scandir, listdir, chdir, getpid, remove, unlink
 from re import split
 from threading import Thread
 from queue import Queue
@@ -38,10 +38,12 @@ from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger
 from foldersynclib.confirmation import Confirmation
 from foldersynclib.about import About
+from foldersynclib.dirlist import DirList
 from foldersynclib.exclusions_copie import ExclusionsCopie
 from foldersynclib.exclusions_supp import ExclusionsSupp
 from datetime import datetime
 import re
+import time
 
 
 class Sync(Tk):
@@ -99,8 +101,8 @@ class Sync(Tk):
         self.logger_copie = setup_logger("copie", self.log_copie)
         self.logger_supp = setup_logger("supp", self.log_supp)
         date = datetime.now().strftime('%d/%m/%Y %H:%M')
-        self.logger_copie.info("\n###  %s  ###\n" % date)
-        self.logger_supp.info("\n###  %s  ###\n" % date)
+        self.logger_copie.info("###  %s  ###\n" % date)
+        self.logger_supp.info("###  %s  ###\n" % date)
 
         # --- filenames and extensions that will not be copied
         exclude_list = split(r'(?<!\\) ',
@@ -423,34 +425,42 @@ class Sync(Tk):
         """ peuple tree_copie avec l'arborescence des fichiers d'original à copier
             vers sauvegarde et tree_supp avec celle des fichiers de sauvegarde à
             supprimer """
+        tps = time.time()
         errors = []
         copy_links = self.copy_links.get()
         excl_supp = [path for path in self.exclude_path_supp if commonpath([path, sauvegarde]) == sauvegarde]
+
+        def get_name(elt):
+            return elt.name.lower()
+
+        def lower(char):
+            return char.lower()
 
         def arbo(tree, parent, n):
             """ affiche l'arborescence complète de parent et renvoie la longueur
                 maximale des items (pour gérer la scrollbar horizontale) """
             m = 0
-            if isdir(parent):
-                try:
-                    l = listdir(parent)
-                except Exception as e:
-                    errors.append(str(e))
-                    l = []
-                l.sort(key=lambda x: x.lower())
+            try:
+                with scandir(parent) as content:
+                    l = sorted(content, key=get_name)
                 for item in l:
-                    chemin = join(parent, item)
-                    if islink(chemin):
+                    chemin = item.path
+                    nom = item.name
+                    if item.is_symlink():
                         if copy_links:
-                            tree.insert(parent, 'end', chemin, text=item,
+                            tree.insert(parent, 'end', chemin, text=nom,
                                         tags=("whole", "link"))
-                            m = max(m, len(item) * 9 + 20 * (n + 1))
-                    elif ((item not in self.exclude_names) and
-                          (splitext(item)[-1] not in self.exclude_ext)):
-                        tree.insert(parent, 'end', chemin, text=item, tags=("whole", ))
-                        m = max(m, len(item) * 9 + 20 * (n + 1))
-                        if isdir(chemin):
+                            m = max(m, len(nom) * 9 + 20 * (n + 1))
+                    elif ((nom not in self.exclude_names) and
+                          (splitext(nom)[-1] not in self.exclude_ext)):
+                        tree.insert(parent, 'end', chemin, text=nom, tags=("whole", ))
+                        m = max(m, len(nom) * 9 + 20 * (n + 1))
+                        if item.is_dir():
                             m = max(m, arbo(tree, chemin, n + 1))
+            except NotADirectoryError:
+                pass
+            except Exception as e:
+                errors.append(str(e))
             return m
 
         def aux(orig, sauve, n, search_supp):
@@ -565,6 +575,7 @@ class Sync(Tk):
         else:
             ms = max(len(sauvegarde) * 9 + 20, mc)
             self.tree_supp.column("#0", minwidth=ms, width=ms)
+        print(- tps + time.time())
         return errors
 
     def show_warning(self, event):
@@ -627,6 +638,7 @@ class Sync(Tk):
                     showwarning("Attention", "Certains éléments à copier (en rouge) ne sont pas de même nature sur l'original et la sauvegarde")
             else:
                 showerror("Erreur", "Chemin invalide !")
+
 
     def efface_tree(self):
         c = self.tree_copie.get_children("")
@@ -753,9 +765,9 @@ class Sync(Tk):
         orig = abspath(self.original) + "/"
         sauve = abspath(self.sauvegarde) + "/"
         chdir(orig)
-        self.logger_copie.info("\nCopie: %s -> %s\n" % (self.original, self.sauvegarde))
+        self.logger_copie.info("Copie: %s -> %s\n" % (self.original, self.sauvegarde))
         n = len(a_supp_avant_cp)
-        self.logger_copie.info("\nSuppression avant copie:")
+        self.logger_copie.info("Suppression avant copie:")
         for i, ch in zip(range(1, n + 1), a_supp_avant_cp):
             self.logger_copie.info(ch)
             p_copie = run(["rm", "-r", ch], stderr=PIPE)
@@ -764,7 +776,7 @@ class Sync(Tk):
             if err:
                 self.err_copie = True
                 self.logger_copie.error(err.strip())
-        self.logger_copie.info("\nCopie:")
+        self.logger_copie.info("Copie:")
         for i, ch in zip(range(n + 1, n + 1 + len(a_copier)), a_copier):
             ch_o = ch.replace(orig, "")
             self.logger_copie.info("%s -> %s" % (ch_o, sauve))
@@ -782,7 +794,7 @@ class Sync(Tk):
             rencontrées au cours du processus sont inscrites dans
             ~/.foldersync/suppression.log """
         self.err_supp = False
-        self.logger_supp.info("\nSuppression: %s -> %s\n" % (self.original, self.sauvegarde))
+        self.logger_supp.info("Suppression: %s -> %s\n" % (self.original, self.sauvegarde))
         for i, ch in enumerate(a_supp):
             self.logger_supp.info(ch)
             p_supp = run(["rm", "-r", ch], stderr=PIPE)
