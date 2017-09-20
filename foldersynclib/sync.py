@@ -43,7 +43,6 @@ from foldersynclib.exclusions_copie import ExclusionsCopie
 from foldersynclib.exclusions_supp import ExclusionsSupp
 from datetime import datetime
 import re
-import time
 
 
 class Sync(Tk):
@@ -175,9 +174,13 @@ class Sync(Tk):
         # paramètres, préférences
         menu_params = Menu(self.menu, tearoff=False)
         self.copy_links = BooleanVar(self, value=CONFIG.getboolean("Defaults", "copy_links"))
+        self.show_size = BooleanVar(self, value=CONFIG.getboolean("Defaults", "show_size"))
         menu_params.add_checkbutton(label="Copier les liens",
                                     variable=self.copy_links,
                                     command=self.toggle_copy_links)
+        menu_params.add_checkbutton(label="Afficher la taille totale",
+                                    variable=self.show_size,
+                                    command=self.toggle_show_size)
         menu_params.add_command(label="Exclusions copie", command=self.exclusion_copie)
         menu_params.add_command(label="Exclusions supp", command=self.exclusion_supp)
 
@@ -366,6 +369,9 @@ class Sync(Tk):
     def toggle_copy_links(self):
         CONFIG.set("Defaults", "copy_links", str(self.copy_links.get()))
 
+    def toggle_show_size(self):
+        CONFIG.set("Defaults", "show_size", str(self.show_size.get()))
+
     def open_log_copie(self):
         run(["xdg-open", self.log_copie])
 
@@ -425,7 +431,6 @@ class Sync(Tk):
         """ peuple tree_copie avec l'arborescence des fichiers d'original à copier
             vers sauvegarde et tree_supp avec celle des fichiers de sauvegarde à
             supprimer """
-        tps = time.time()
         errors = []
         copy_links = self.copy_links.get()
         excl_supp = [path for path in self.exclude_path_supp if commonpath([path, sauvegarde]) == sauvegarde]
@@ -575,7 +580,6 @@ class Sync(Tk):
         else:
             ms = max(len(sauvegarde) * 9 + 20, mc)
             self.tree_supp.column("#0", minwidth=ms, width=ms)
-        print(- tps + time.time())
         return errors
 
     def show_warning(self, event):
@@ -733,7 +737,7 @@ class Sync(Tk):
             if ch in a_copier:
                 a_supp_avant_cp.append(ch.replace(self.original, self.sauvegarde))
         if a_supp or a_copier:
-            Confirmation(self, a_copier, a_supp, a_supp_avant_cp, self.original, self.sauvegarde)
+            Confirmation(self, a_copier, a_supp, a_supp_avant_cp, self.original, self.sauvegarde, self.show_size.get())
 
     def copie_supp(self, a_copier, a_supp, a_supp_avant_cp):
         """ launch sync """

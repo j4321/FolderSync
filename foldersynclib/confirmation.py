@@ -24,12 +24,15 @@ Sync confirmation
 from tkinter import Toplevel, Text
 from tkinter.ttk import Button, Label, PanedWindow, Style, Frame
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
+from foldersynclib.constantes import convert_size
+from os import scandir
+from os.path import getsize
 
 class Confirmation(Toplevel):
     """ Confirmation window that recapitulate the changes that will be made
         during the synchronisation """
 
-    def __init__(self, master, a_copier, a_supp, a_supp_avant_cp, original, sauvegarde):
+    def __init__(self, master, a_copier, a_supp, a_supp_avant_cp, original, sauvegarde, show_size):
         Toplevel.__init__(self, master)
         self.geometry("%ix%i" % (self.winfo_screenwidth(), self.winfo_screenheight()))
         self.rowconfigure(1, weight=1)
@@ -72,6 +75,8 @@ class Confirmation(Toplevel):
         txt_copie.configure(yscrollcommand=scrolly_copie.set, xscrollcommand=scrollx_copie.set)
         txt_copie.insert("1.0", "\n".join(a_copier))
         txt_copie.configure(state="disabled")
+        self._size_copy = Label(frame_copie)
+        self._size_copy.grid(row=3, column=0)
 
         frame_supp = Frame(paned)
         frame_supp.columnconfigure(0, weight=1)
@@ -92,6 +97,8 @@ class Confirmation(Toplevel):
         txt_supp.configure(yscrollcommand=scrolly_supp.set, xscrollcommand=scrollx_supp.set)
         txt_supp.insert("1.0", "\n".join(a_supp))
         txt_supp.configure(state="disabled")
+        self._size_supp = Label(frame_supp)
+        self._size_supp.grid(row=3, column=0)
 
         Button(self, command=self.ok,
                text="Ok").grid(row=3, column=0, sticky="e",
@@ -99,7 +106,34 @@ class Confirmation(Toplevel):
         Button(self, text="Annuler",
                command=self.destroy).grid(row=3, column=1, sticky="w",
                                           padx=(4,10), pady=(4,10))
+        if show_size:
+            self.compute_size()
         self.grab_set()
+
+    def compute_size(self):
+
+        def size(path):
+            s = 0
+            try:
+                with scandir(path) as content:
+                    for f in content:
+                        if f.is_file():
+                            s += f.stat().st_size
+                        else:
+                            s += size(f.path)
+            except NotADirectoryError:
+                s = getsize(path)
+            return s
+
+        size_copy = 0
+        size_supp = 0
+
+        for path in self.a_copier:
+            size_copy += size(path)
+        for path in self.a_supp:
+            size_supp += size(path)
+        self._size_copy.configure(text="Total à copier : %s" % convert_size(size_copy))
+        self._size_supp.configure(text="Total à supprimer : %s" % convert_size(size_supp))
 
     def ok(self):
         self.grab_release()

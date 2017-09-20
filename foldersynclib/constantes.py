@@ -29,15 +29,19 @@ from sys import platform
 from configparser import ConfigParser
 from tkinter import filedialog
 from subprocess import check_output, CalledProcessError
+import locale
+from math import log, floor
 
-# fichier de config
+def _(text):
+    return text
+
+# --- fichier de config
 PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
 
-PID_FILE = "/tmp/foldersync%i.pid"
+PID_FILE = os.path.join(PATH, "foldersync%i.pid")
 
 LOG_COPIE = os.path.join(PATH, "copie%i.log")
 LOG_SUPP = os.path.join(PATH, "suppression%i.log")
-
 
 def setup_logger(name, log_file, level=logging.INFO):
     """Setup a logger and return it."""
@@ -61,6 +65,7 @@ if not os.path.exists(PATH_CONFIG):
         os.mkdir(PATH)
     CONFIG.add_section("Default")
     CONFIG.set("Defaults", "copy_links", "True")
+    CONFIG.set("Defaults", "show_size", "True")
     CONFIG.set("Defaults", "exclude_copie", "")
     CONFIG.set("Defaults", "exclude_supp", "")
     CONFIG.add_section("Recent")
@@ -71,6 +76,8 @@ if not os.path.exists(PATH_CONFIG):
     CONFIG.set("Favoris", "sauve", "")
 else:
     CONFIG.read(PATH_CONFIG)
+    if not CONFIG.has_option("Defaults", "show_size"):
+        CONFIG.set("Defaults", "show_size", "True")
 
 r_o = CONFIG.get("Recent", "orig").split(", ")
 r_s = CONFIG.get("Recent", "sauve").split(", ")
@@ -86,7 +93,25 @@ if f_o == ['']:
 else:
     FAVORIS = list(zip(f_o, f_s))
 
-# Images
+# --- file size
+SIZES = [_("B"), _("kB"), _("MB"), _("GB"), _("TB")]
+
+def convert_size(size):
+    """Convert size from B to kB, MB, ..."""
+    if size > 0:
+        m = int(floor(log(size)/log(1024)))
+        if m < len(SIZES):
+            unit = SIZES[m]
+            s = size/(1024**m)
+        else:
+            unit = SIZES[-1]
+            s = size/(1024**(len(SIZES) - 1))
+        size = "%s %s" % (locale.format("%.1f", s), unit)
+    else:
+        size = "0 " + _("B")
+    return size
+
+# --- Images
 IMAGE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "images")
 IM_ICON = os.path.join(IMAGE_PATH, "icon.png")
 IM_ABOUT = os.path.join(IMAGE_PATH, "about.png")
@@ -104,7 +129,7 @@ IM_CHECKED = os.path.join(IMAGE_PATH, "checked.png")
 IM_UNCHECKED = os.path.join(IMAGE_PATH, "unchecked.png")
 IM_TRISTATE = os.path.join(IMAGE_PATH, "tristate.png")
 
-# filebrowser
+# --- filebrowser
 ZENITY = False
 if platform != "nt":
     paths = os.environ['PATH'].split(":")
