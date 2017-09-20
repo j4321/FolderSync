@@ -28,9 +28,12 @@ from foldersynclib.constantes import convert_size
 from os import scandir
 from os.path import getsize
 
+
 class Confirmation(Toplevel):
-    """ Confirmation window that recapitulate the changes that will be made
-        during the synchronisation """
+    """
+    Confirmation window that recapitulate the changes that will be made
+    during the synchronisation.
+    """
 
     def __init__(self, master, a_copier, a_supp, a_supp_avant_cp, original, sauvegarde, show_size):
         Toplevel.__init__(self, master)
@@ -38,7 +41,7 @@ class Confirmation(Toplevel):
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        self.title("Confirmation")
+        self.title(_("Confirmation"))
 
         self.a_copier = a_copier
         self.a_supp = a_supp
@@ -56,11 +59,12 @@ class Confirmation(Toplevel):
         paned.columnconfigure(0, weight=1)
         paned.columnconfigure(1, weight=1)
         paned.rowconfigure(1, weight=1)
+        # --- copy
         frame_copie = Frame(paned)
         frame_copie.columnconfigure(0, weight=1)
         frame_copie.rowconfigure(1, weight=1)
         paned.add(frame_copie, weight=1)
-        Label(frame_copie, text="À copier :").grid(row=0, columnspan=2, padx=(10,4), pady=4)
+        Label(frame_copie, text=_("To copy:")).grid(row=0, columnspan=2, padx=(10,4), pady=4)
         f_copie = Frame(frame_copie, style="text.TFrame", borderwidth=1)
         f_copie.columnconfigure(0, weight=1)
         f_copie.rowconfigure(0, weight=1)
@@ -77,7 +81,7 @@ class Confirmation(Toplevel):
         txt_copie.configure(state="disabled")
         self._size_copy = Label(frame_copie)
         self._size_copy.grid(row=3, column=0)
-
+        # --- deletion
         frame_supp = Frame(paned)
         frame_supp.columnconfigure(0, weight=1)
         frame_supp.rowconfigure(1, weight=1)
@@ -103,7 +107,7 @@ class Confirmation(Toplevel):
         Button(self, command=self.ok,
                text="Ok").grid(row=3, column=0, sticky="e",
                                              padx=(10,4), pady=(4,10))
-        Button(self, text="Annuler",
+        Button(self, text=_("Cancel"),
                command=self.destroy).grid(row=3, column=1, sticky="w",
                                           padx=(4,10), pady=(4,10))
         if show_size:
@@ -111,7 +115,7 @@ class Confirmation(Toplevel):
         self.grab_set()
 
     def compute_size(self):
-
+        """Compute and display total size of files to copy/to delete."""
         def size(path):
             s = 0
             try:
@@ -132,10 +136,11 @@ class Confirmation(Toplevel):
             size_copy += size(path)
         for path in self.a_supp:
             size_supp += size(path)
-        self._size_copy.configure(text="Total à copier : %s" % convert_size(size_copy))
-        self._size_supp.configure(text="Total à supprimer : %s" % convert_size(size_supp))
+        self._size_copy.configure(text=_("Copy: %s") % convert_size(size_copy))
+        self._size_supp.configure(text=_("Remove: %s") % convert_size(size_supp))
 
     def ok(self):
+        """Close dialog and start sync."""
         self.grab_release()
         self.master.copie_supp(self.a_copier, self.a_supp, self.a_supp_avant_cp)
         self.destroy()

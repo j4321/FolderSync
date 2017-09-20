@@ -20,17 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Main GUI
 """
 
-# TODO: tester os.scandir
-
 from os.path import join, splitext, exists, isdir, islink, isfile, getmtime, abspath, commonpath
 from os import scandir, listdir, chdir, getpid, remove, unlink
 from re import split
 from threading import Thread
 from queue import Queue
 from subprocess import run, PIPE
-from tkinter import Tk, PhotoImage, Menu, BooleanVar
+from tkinter import Tk, PhotoImage, Menu, BooleanVar, StringVar
 from tkinter.ttk import Label, Button, PanedWindow, Entry, Style, Frame, Progressbar
-from tkinter.messagebox import showerror, askokcancel, showwarning
+from tkinter.messagebox import showerror, askokcancel, showwarning, showinfo
 from foldersynclib.checkboxtreeview import CheckboxTreeview
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
@@ -38,7 +36,6 @@ from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger
 from foldersynclib.confirmation import Confirmation
 from foldersynclib.about import About
-from foldersynclib.dirlist import DirList
 from foldersynclib.exclusions_copie import ExclusionsCopie
 from foldersynclib.exclusions_supp import ExclusionsSupp
 from datetime import datetime
@@ -46,6 +43,7 @@ import re
 
 
 class Sync(Tk):
+    """FolderSync main window."""
     def __init__(self):
         Tk.__init__(self)
         self.title("FolderSync")
@@ -181,6 +179,15 @@ class Sync(Tk):
         menu_params.add_checkbutton(label="Afficher la taille totale",
                                     variable=self.show_size,
                                     command=self.toggle_show_size)
+        self.langue = StringVar(self, CONFIG.get("Defaults", "language"))
+        menu_lang = Menu(menu_params, tearoff=False)
+        menu_lang.add_radiobutton(label="English", value="en",
+                                  variable=self.langue,
+                                  command=self.change_language)
+        menu_lang.add_radiobutton(label="French", value="fr",
+                                  variable=self.langue,
+                                  command=self.change_language)
+        menu_params.add_cascade(label=_("Language"), menu=menu_lang)
         menu_params.add_command(label="Exclusions copie", command=self.exclusion_copie)
         menu_params.add_command(label="Exclusions supp", command=self.exclusion_supp)
 
@@ -225,18 +232,6 @@ class Sync(Tk):
                                    style="folder.TButton",
                                    command=self.open_sauve)
         self.b_open_sauve.grid(row=0, column=5, padx=(1, 10))
-
-#        self.b_prev = Button(frame_paths, image=self.img_prev,
-#                             command=self.list_files_to_sync)
-#        self.b_prev.grid(row=1, column=4, padx=4)
-#
-#        self.b_sync = Button(frame_paths, image=self.img_sync,
-#                             command=self.synchronise)
-#        self.b_sync.grid(row=1, column=5, padx=(4, 10))
-#        self.b_sync.state(("disabled", ))
-#        self.b_prev = Button(self, image=self.img_prev,
-#                             command=self.list_files_to_sync)
-#        self.b_prev.grid(row=1, sticky="ew", pady=(4, 10), padx=10)
 
         paned = PanedWindow(self, orient='horizontal')
         paned.grid(row=2, sticky="eswn")
@@ -333,14 +328,7 @@ class Sync(Tk):
                             padx=(4, 10), pady=4)
         self.pbar_supp.state(("disabled", ))
 
-
-#        # lancer synchronisation
-#        self.b_sync = Button(self, image=self.img_sync,
-#                             command=self.synchronise)
-#        self.b_sync.grid(row=3, sticky="ew", pady=(4, 10), padx=10)
-#        self.b_sync.state(("disabled", ))
-
-        # bindings
+        # --- bindings
         self.entry_orig.bind("<Key-Return>", self.list_files_to_sync)
         self.entry_sauve.bind("<Key-Return>", self.list_files_to_sync)
 
@@ -657,7 +645,7 @@ class Sync(Tk):
         self.b_expand_supp.state(("disabled", ))
 
     def toggle_state_gui(self):
-        """ toggle the state (normal/disabled) of key elements of the GUI """
+        """Toggle the state (normal/disabled) of key elements of the GUI."""
         if "disabled" in self.b_open_orig.state():
             state = "!disabled"
             for i in range(7):
@@ -680,8 +668,10 @@ class Sync(Tk):
         self.b_open_sauve.state((state, ))
 
     def update_pbar(self):
-        """ dislay the progress of the copy and deletion and put the GUI back in
-            normal state once both processes are done. """
+        """
+        Dislay the progress of the copy and deletion and put the GUI back in
+        normal state once both processes are done.
+        """
         if not self.is_running_copie and not self.is_running_supp:
             run(["notify-send", "-i", IM_ICON, "FolderSync", "Sync is finished."])
             self.toggle_state_gui()
@@ -708,8 +698,7 @@ class Sync(Tk):
 
     @staticmethod
     def get_list(tree):
-        """ return the list of files/folders to copy/delete
-            (depending on the tree)"""
+        """Return the list of files/folders to copy/delete (depending on the tree)."""
         selected = []
 
         def aux(item):
@@ -726,8 +715,10 @@ class Sync(Tk):
         return selected
 
     def synchronise(self):
-        """ display the list of files/folders that will be copied / deleted
-            and launch the copy and deletion if the user validates the sync. """
+        """
+        Display the list of files/folders that will be copied / deleted
+        and launch the copy and deletion if the user validates the sync.
+        """
         # get files to delete and folder to delete if they are empty
         a_supp = self.get_list(self.tree_supp)
         # get files to copy
@@ -740,7 +731,7 @@ class Sync(Tk):
             Confirmation(self, a_copier, a_supp, a_supp_avant_cp, self.original, self.sauvegarde, self.show_size.get())
 
     def copie_supp(self, a_copier, a_supp, a_supp_avant_cp):
-        """ launch sync """
+        """Launch sync."""
         self.toggle_state_gui()
         self.configure(cursor="watch")
         self.update()
@@ -761,10 +752,12 @@ class Sync(Tk):
         self.update_pbar()
 
     def copie(self, a_copier, a_supp_avant_cp):
-        """ copie tous les fichiers/dossiers de a_copier de original vers
-            sauvegarde en utilisant la commande système cp. Les erreurs
-            rencontrées au cours du processus sont inscrites dans
-            ~/.foldersync/copie.log """
+        """
+        Copie tous les fichiers/dossiers de a_copier de original vers
+        sauvegarde en utilisant la commande système cp. Les erreurs
+        rencontrées au cours du processus sont inscrites dans
+        ~/.foldersync/copie.log
+        """
         self.err_copie = False
         orig = abspath(self.original) + "/"
         sauve = abspath(self.sauvegarde) + "/"
@@ -793,10 +786,12 @@ class Sync(Tk):
         self.is_running_copie = False
 
     def supp(self, a_supp):
-        """ supprime tous les fichiers/dossiers de a_supp de original vers
-            sauvegarde en utilisant la commande système rm. Les erreurs
-            rencontrées au cours du processus sont inscrites dans
-            ~/.foldersync/suppression.log """
+        """
+        supprime tous les fichiers/dossiers de a_supp de original vers
+        sauvegarde en utilisant la commande système rm. Les erreurs
+        rencontrées au cours du processus sont inscrites dans
+        ~/.foldersync/suppression.log.
+        """
         self.err_supp = False
         self.logger_supp.info("Suppression: %s -> %s\n" % (self.original, self.sauvegarde))
         for i, ch in enumerate(a_supp):
@@ -812,3 +807,9 @@ class Sync(Tk):
     def unlink(self):
         """Unlink pidfile."""
         unlink(self.pidfile)
+
+    def change_language(self):
+        """Change app language."""
+        CONFIG.set("Defaults", "language", self.langue.get())
+        showinfo(_("Information"),
+                 _("The language setting will take effect after restarting the application"))

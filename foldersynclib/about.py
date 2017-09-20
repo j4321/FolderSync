@@ -26,9 +26,6 @@ from tkinter import Text, Toplevel, PhotoImage
 from tkinter.ttk import Button, Label
 from foldersynclib.constantes import IM_ICON, VERSION
 
-# awaiting translation
-def _(text):
-    return text
 
 class About(Toplevel):
     """ Toplevel de l'application principale donnant les informations à

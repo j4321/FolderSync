@@ -31,12 +31,12 @@ from tkinter import filedialog
 from subprocess import check_output, CalledProcessError
 import locale
 from math import log, floor
+import gettext
 
-def _(text):
-    return text
 
 # --- fichier de config
 PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
+PATH_LOCALE = "/usr/share/locale"
 
 PID_FILE = os.path.join(PATH, "foldersync%i.pid")
 
@@ -68,16 +68,22 @@ if not os.path.exists(PATH_CONFIG):
     CONFIG.set("Defaults", "show_size", "True")
     CONFIG.set("Defaults", "exclude_copie", "")
     CONFIG.set("Defaults", "exclude_supp", "")
+    CONFIG.set("Defaults", "language", "")
     CONFIG.add_section("Recent")
     CONFIG.set("Recent", "orig", "")
     CONFIG.set("Recent", "sauve", "")
     CONFIG.add_section("Favoris")
     CONFIG.set("Favoris", "orig", "")
     CONFIG.set("Favoris", "sauve", "")
+    LANGUE = ""
 else:
     CONFIG.read(PATH_CONFIG)
     if not CONFIG.has_option("Defaults", "show_size"):
         CONFIG.set("Defaults", "show_size", "True")
+    if not CONFIG.has_option("Defaults", "language"):
+        CONFIG.set("Defaults", "language", "")
+    LANGUE = CONFIG.get("Defaults", "language")
+
 
 r_o = CONFIG.get("Recent", "orig").split(", ")
 r_s = CONFIG.get("Recent", "sauve").split(", ")
@@ -92,6 +98,27 @@ if f_o == ['']:
     FAVORIS = []
 else:
     FAVORIS = list(zip(f_o, f_s))
+
+# ---  Translation
+APP_NAME = "FolderSync"
+
+if LANGUE not in ["en", "fr"]:
+    # Check the default locale
+    lc = locale.getdefaultlocale()[0][:2]
+    if lc == "fr":
+        # If we have a default, it's the first in the list
+        LANGUE = "fr_FR"
+    else:
+        LANGUE = "en_US"
+    CONFIG.set("Defaults", "language", LANGUE[:2])
+
+gettext.find(APP_NAME, PATH_LOCALE)
+gettext.bind_textdomain_codeset(APP_NAME, "UTF-8")
+gettext.bindtextdomain(APP_NAME, PATH_LOCALE)
+gettext.textdomain(APP_NAME)
+LANG = gettext.translation(APP_NAME, PATH_LOCALE,
+                           languages=[LANGUE], fallback=True)
+LANG.install()
 
 # --- file size
 SIZES = [_("B"), _("kB"), _("MB"), _("GB"), _("TB")]
