@@ -33,7 +33,7 @@ from foldersynclib.checkboxtreeview import CheckboxTreeview
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT, IM_PREV, IM_SYNC, IM_EXPAND, \
-    IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger
+    IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH
 from foldersynclib.confirmation import Confirmation
 from foldersynclib.about import About
 from foldersynclib.exclusions_copie import ExclusionsCopie
@@ -73,10 +73,10 @@ class Sync(Tk):
         self.err_supp = False
 
         # --- init log files
-        l = [f for f in listdir('/tmp') if re.match(r"foldersync[0-9]+.pid", f)]
+        l = [f for f in listdir(PATH) if re.match(r"foldersync[0-9]+.pid", f)]
         nbs = []
         for f in l:
-            with open(join('/tmp', f)) as fich:
+            with open(join(PATH, f)) as fich:
                 old_pid = fich.read().strip()
             if exists("/proc/%s" % old_pid):
                 nbs.append(int(re.search(r"[0-9]+", f).group()))
