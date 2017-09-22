@@ -28,19 +28,20 @@ from foldersynclib.constantes import save_config, askdirectories, askfiles
 from os.path import dirname
 from re import split
 
+
 class ExclusionsSupp(Toplevel):
-    """ list of paths that will be excluded from the suppression """
+    """List of paths that will be excluded from removal."""
     def __init__(self, master):
         Toplevel.__init__(self, master)
         self.protocol("WM_DELETE_WINDOW", self.quitter)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
-        self.title("Exclusions")
+        self.title(_("Exclusions"))
         self.transient(master)
         self.grab_set()
 
-        self.last_path = "" # last opened path
+        self.last_path = ""  # last opened path
 
         self.img_open = PhotoImage(file=IM_OPEN)
         self.img_doc = PhotoImage(file=IM_DOC)
@@ -52,13 +53,12 @@ class ExclusionsSupp(Toplevel):
         frame = Frame(self)
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(0, weight=1)
-        frame.grid(row=0, columnspan=3, sticky="eswn", padx=10, pady=(10,4))
+        frame.grid(row=0, columnspan=3, sticky="eswn", padx=10, pady=(10, 4))
 
         listbox_frame = Frame(frame, borderwidth=1, style="list.TFrame")
         listbox_frame.columnconfigure(0, weight=1)
         listbox_frame.rowconfigure(0, weight=1)
         listbox_frame.grid(row=0, column=0, sticky="nswe")
-
 
         self.listvar = StringVar(self, value=CONFIG.get("Defaults", "exclude_supp"))
         self.exclude_list = split(r'(?<!\\) ',
@@ -78,13 +78,13 @@ class ExclusionsSupp(Toplevel):
 
         Button(self, image=self.img_doc,
                command=self.add_doc).grid(row=1, column=0, sticky="e",
-                                          padx=(10,4), pady=(4,10))
+                                          padx=(10, 4), pady=(4, 10))
         Button(self, image=self.img_open,
                command=self.add_dir).grid(row=1, column=1,
-                                          padx=4, pady=(4,10))
+                                          padx=4, pady=(4, 10))
         Button(self, image=self.img_supp,
                command=self.rem).grid(row=1, column=2, sticky="w",
-                                      padx=(4,10), pady=(4,10))
+                                      padx=(4, 10), pady=(4, 10))
         self.geometry("500x400")
 
     def add_doc(self):
@@ -97,7 +97,7 @@ class ExclusionsSupp(Toplevel):
         if docs[0]:
             for d in docs:
                 d = d.replace(" ", "\ ")
-                if not d in self.exclude_list:
+                if d not in self.exclude_list:
                     self.exclude_list.append(d)
             self.last_path = dirname(docs[-1])
             self.listvar.set(" ".join(self.exclude_list))
@@ -112,7 +112,7 @@ class ExclusionsSupp(Toplevel):
         if dirs[0]:
             for d in dirs:
                 d = d.replace(" ", "\ ")
-                if not d in self.exclude_list:
+                if d not in self.exclude_list:
                     self.exclude_list.append(d)
             self.last_path = dirs[-1]
             self.listvar.set(" ".join(self.exclude_list))
@@ -125,8 +125,7 @@ class ExclusionsSupp(Toplevel):
             self.exclude_list.remove(txt.replace(" ", "\ "))
             self.listbox.delete(sel)
 
-
     def quitter(self):
-        CONFIG.set("Defaults", "exclude_supp"," ".join(self.exclude_list))
+        CONFIG.set("Defaults", "exclude_supp", " ".join(self.exclude_list))
         save_config()
         self.destroy()

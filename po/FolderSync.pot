@@ -1,0 +1,253 @@
+# FolderSync - Folder synchronization software
+# Copyright (C) 2017 Juliette Monsel
+# This file is distributed under the same license as the FolderSync package.
+# Juliette Monsel <j_4321@protonmail.com>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-09-22 11:36+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: foldersynclib/constantes.py:121 foldersynclib/constantes.py:135
+msgid "B"
+msgstr ""
+
+#: foldersynclib/constantes.py:121
+msgid "kB"
+msgstr ""
+
+#: foldersynclib/constantes.py:121
+msgid "MB"
+msgstr ""
+
+#: foldersynclib/constantes.py:121
+msgid "GB"
+msgstr ""
+
+#: foldersynclib/constantes.py:121
+msgid "TB"
+msgstr ""
+
+#: foldersynclib/exclusions_copie.py:42 foldersynclib/exclusions_supp.py:40
+msgid "Exclusions"
+msgstr ""
+
+#: foldersynclib/about.py:38
+msgid "About FolderSync"
+msgstr ""
+
+#: foldersynclib/about.py:43
+#, python-format
+msgid "FolderSync %(version)s"
+msgstr ""
+
+#: foldersynclib/about.py:45
+msgid "Folder synchronization software"
+msgstr ""
+
+#: foldersynclib/about.py:48 foldersynclib/about.py:72
+msgid "License"
+msgstr ""
+
+#: foldersynclib/about.py:49 foldersynclib/about.py:98
+msgid "Close"
+msgstr ""
+
+#: foldersynclib/about.py:81
+msgid ""
+"FolderSync is free software: you can redistribute it and/or modify it under "
+"the terms of the GNU General Public License as published by the Free "
+"Software Foundation, either version 3 of the License, or (at your option) "
+"any later version.\n"
+"\n"
+msgstr ""
+
+#: foldersynclib/about.py:83
+msgid ""
+"FolderSync is distributed in the hope that it will be useful, but WITHOUT "
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+"FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for "
+"more details.\n"
+"\n"
+msgstr ""
+
+#: foldersynclib/about.py:85
+msgid ""
+"You should have received a copy of the GNU General Public License along with "
+"this program. If not, see http://www.gnu.org/licenses/."
+msgstr ""
+
+#: foldersynclib/sync.py:154
+msgid "Add"
+msgstr ""
+
+#: foldersynclib/sync.py:156
+msgid "Remove"
+msgstr ""
+
+#: foldersynclib/sync.py:169
+msgid "Copy"
+msgstr ""
+
+#: foldersynclib/sync.py:170
+msgid "Removal"
+msgstr ""
+
+#: foldersynclib/sync.py:176
+msgid "Copy links"
+msgstr ""
+
+#: foldersynclib/sync.py:179
+msgid "Show total size"
+msgstr ""
+
+#: foldersynclib/sync.py:190
+msgid "Language"
+msgstr ""
+
+#: foldersynclib/sync.py:191
+msgid "Exclude from copy"
+msgstr ""
+
+#: foldersynclib/sync.py:192
+msgid "Exclude from removal"
+msgstr ""
+
+#: foldersynclib/sync.py:194
+msgid "Recents"
+msgstr ""
+
+#: foldersynclib/sync.py:195
+msgid "Favorites"
+msgstr ""
+
+#: foldersynclib/sync.py:196
+msgid "Log"
+msgstr ""
+
+#: foldersynclib/sync.py:197
+msgid "Settings"
+msgstr ""
+
+#: foldersynclib/sync.py:220
+msgid "Original"
+msgstr ""
+
+#: foldersynclib/sync.py:228
+msgid "Backup"
+msgstr ""
+
+#: foldersynclib/sync.py:253
+msgid "To copy"
+msgstr ""
+
+#: foldersynclib/sync.py:299
+msgid "To remove"
+msgstr ""
+
+#: foldersynclib/sync.py:372 foldersynclib/confirmation.py:46
+msgid "Confirmation"
+msgstr ""
+
+#: foldersynclib/sync.py:373
+msgid "A synchronization is ongoing, do you really want to quit?"
+msgstr ""
+
+#: foldersynclib/sync.py:581 foldersynclib/sync.py:632
+msgid "Warning"
+msgstr ""
+
+#: foldersynclib/sync.py:582
+#, python-format
+msgid "%(original)s and %(backup)s are not of the same kind (folder/file/link)"
+msgstr ""
+
+#: foldersynclib/sync.py:628
+msgid "Errors"
+msgstr ""
+
+#: foldersynclib/sync.py:633
+msgid ""
+"Some elements to copy (in red) are not of the same kind on the original and "
+"the backup."
+msgstr ""
+
+#: foldersynclib/sync.py:636 foldersynclib/sync.py:691
+msgid "Error"
+msgstr ""
+
+#: foldersynclib/sync.py:636
+msgid "Invalid path!"
+msgstr ""
+
+#: foldersynclib/sync.py:687
+#, python-format
+msgid "There were errors during the copy, see %(file)s for more details.\n"
+msgstr ""
+
+#: foldersynclib/sync.py:689
+#, python-format
+msgid "There were errors during the removal, see %(file)s for more details.\n"
+msgstr ""
+
+#: foldersynclib/sync.py:766
+#, python-format
+msgid "Copy: %(original)s -> %(backup)s\n"
+msgstr ""
+
+#: foldersynclib/sync.py:768
+msgid "Removal before copy:"
+msgstr ""
+
+#: foldersynclib/sync.py:777
+msgid "Copy:"
+msgstr ""
+
+#: foldersynclib/sync.py:797
+#, python-format
+msgid "Removal:  %(original)s -> %(backup)s\n"
+msgstr ""
+
+#: foldersynclib/sync.py:815
+msgid "Information"
+msgstr ""
+
+#: foldersynclib/sync.py:816
+msgid "The language setting will take effect after restarting the application"
+msgstr ""
+
+#: foldersynclib/confirmation.py:58
+#, python-format
+msgid "Synchronization from %(original)s to %(backup)s"
+msgstr ""
+
+#: foldersynclib/confirmation.py:70
+msgid "To copy:"
+msgstr ""
+
+#: foldersynclib/confirmation.py:97
+msgid "To remove:"
+msgstr ""
+
+#: foldersynclib/confirmation.py:122
+msgid "Cancel"
+msgstr ""
+
+#: foldersynclib/confirmation.py:156
+#, python-format
+msgid "Copy: %(size)s"
+msgstr ""
+
+#: foldersynclib/confirmation.py:157
+#, python-format
+msgid "Remove: %(size)s"
+msgstr ""

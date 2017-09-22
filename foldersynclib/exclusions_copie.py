@@ -27,16 +27,19 @@ from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.constantes import CONFIG, IM_SUPP, IM_ADD, save_config
 from re import split
 
+
 class ExclusionsCopie(Toplevel):
-    """ list of file/folder names and file extensions (e.g. *.pyc)
-        that will be excluded from the copy """
+    """
+    List of file/folder names and file extensions (e.g. *.pyc) that will be
+    excluded from the copy.
+    """
     def __init__(self, master):
         Toplevel.__init__(self, master)
         self.protocol("WM_DELETE_WINDOW", self.quitter)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-        self.title("Exclusions")
+        self.title(_("Exclusions"))
         self.transient(master)
         self.grab_set()
         self.img_supp = PhotoImage(file=IM_SUPP)
@@ -48,7 +51,7 @@ class ExclusionsCopie(Toplevel):
         frame = Frame(self)
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(0, weight=1)
-        frame.grid(row=0, columnspan=2, sticky="eswn", padx=10, pady=(10,4))
+        frame.grid(row=0, columnspan=2, sticky="eswn", padx=10, pady=(10, 4))
 
         listbox_frame = Frame(frame, borderwidth=1, style="list.TFrame")
         listbox_frame.columnconfigure(0, weight=1)
@@ -73,17 +76,17 @@ class ExclusionsCopie(Toplevel):
 
         Button(self, image=self.img_add,
                command=self.add).grid(row=1, column=0, sticky="e",
-                                      padx=(10,4), pady=(4,10))
+                                      padx=(10, 4), pady=(4, 10))
         Button(self, image=self.img_supp,
                command=self.rem).grid(row=1, column=1, sticky="w",
-                                      padx=(4,10), pady=(4,10))
+                                      padx=(4, 10), pady=(4, 10))
         self.geometry("200x300")
 
     def add(self):
         def ok(event=None):
             txt = e.get()
             txt = txt.strip().replace(" ", "\ ")
-            if txt and not txt in self.exclude_list:
+            if txt and txt not in self.exclude_list:
                 self.exclude_list.append(txt)
                 self.listvar.set(" ".join(self.exclude_list))
             top.destroy()
@@ -91,10 +94,10 @@ class ExclusionsCopie(Toplevel):
         top.transient(self)
         top.grab_set()
         e = Entry(top)
-        e.pack(expand=True, fill="x", padx=10, pady=(10,4))
+        e.pack(expand=True, fill="x", padx=10, pady=(10, 4))
         e.focus_set()
         e.bind("<Key-Return>", ok)
-        Button(top, text="Ok", command=ok).pack(padx=10, pady=(4,10))
+        Button(top, text="Ok", command=ok).pack(padx=10, pady=(4, 10))
 
     def rem(self):
         sel = self.listbox.curselection()

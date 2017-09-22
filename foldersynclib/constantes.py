@@ -20,8 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Constants
 """
 
-import pkg_resources
-VERSION = pkg_resources.require("FolderSync")[0].version
+
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
@@ -36,17 +35,17 @@ import gettext
 
 # --- fichier de config
 PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
-PATH_LOCALE = "/usr/share/locale"
 
 PID_FILE = os.path.join(PATH, "foldersync%i.pid")
 
 LOG_COPIE = os.path.join(PATH, "copie%i.log")
 LOG_SUPP = os.path.join(PATH, "suppression%i.log")
 
+
 def setup_logger(name, log_file, level=logging.INFO):
     """Setup a logger and return it."""
-    formatter=logging.Formatter('%(levelname)s %(message)s',
-                                datefmt='%Y-%m-%d %H:%M:%S')
+    formatter = logging.Formatter('%(levelname)s %(message)s',
+                                  datefmt='%Y-%m-%d %H:%M:%S')
     handler = TimedRotatingFileHandler(log_file, when='midnight',
                                        interval=1, backupCount=7)
     handler.setFormatter(formatter)
@@ -99,6 +98,7 @@ if f_o == ['']:
 else:
     FAVORIS = list(zip(f_o, f_s))
 
+
 # ---  Translation
 APP_NAME = "FolderSync"
 
@@ -112,13 +112,10 @@ if LANGUE not in ["en", "fr"]:
         LANGUE = "en_US"
     CONFIG.set("Defaults", "language", LANGUE[:2])
 
-gettext.find(APP_NAME, PATH_LOCALE)
-gettext.bind_textdomain_codeset(APP_NAME, "UTF-8")
-gettext.bindtextdomain(APP_NAME, PATH_LOCALE)
-gettext.textdomain(APP_NAME)
-LANG = gettext.translation(APP_NAME, PATH_LOCALE,
+LANG = gettext.translation(APP_NAME,
                            languages=[LANGUE], fallback=True)
 LANG.install()
+
 
 # --- file size
 SIZES = [_("B"), _("kB"), _("MB"), _("GB"), _("TB")]
@@ -138,6 +135,7 @@ def convert_size(size):
         size = "0 " + _("B")
     return size
 
+
 # --- Images
 IMAGE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "images")
 IM_ICON = os.path.join(IMAGE_PATH, "icon.png")
@@ -156,6 +154,7 @@ IM_CHECKED = os.path.join(IMAGE_PATH, "checked.png")
 IM_UNCHECKED = os.path.join(IMAGE_PATH, "unchecked.png")
 IM_TRISTATE = os.path.join(IMAGE_PATH, "tristate.png")
 
+
 # --- filebrowser
 ZENITY = False
 if platform != "nt":
@@ -168,6 +167,7 @@ try:
     import tkfilebrowser as tkfb
 except ImportError:
     tkfb = False
+
 
 def askdirectory(initialdir, title="Ouvrir", **options):
     """ folder browser:
@@ -191,6 +191,7 @@ def askdirectory(initialdir, title="Ouvrir", **options):
         return filedialog.askdirectory(title=title, initialdir=initialdir,
                                        **options)
 
+
 def askdirectories(initialdir, title="Séléctionner", **options):
     """ folder selector:
         initialdir: directory where the filebrowser is opened
@@ -213,6 +214,7 @@ def askdirectories(initialdir, title="Séléctionner", **options):
         return filedialog.askdirectory(title=title, initialdir=initialdir,
                                        **options)
 
+
 def askfiles(initialdir, title="Séléctionner", **options):
     """ files selector:
         initialdir: directory where the filebrowser is opened
@@ -234,6 +236,7 @@ def askfiles(initialdir, title="Séléctionner", **options):
     else:
         return filedialog.askopenfilenames(title=title, initialdir=initialdir,
                                        **options)
+
 
 def save_config():
     # save recent files
