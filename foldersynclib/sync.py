@@ -31,7 +31,7 @@ from tkinter.ttk import Label, Button, PanedWindow, Entry, Style, Frame, Progres
 from tkinter.messagebox import showerror, askokcancel, showwarning, showinfo
 from foldersynclib.checkboxtreeview import CheckboxTreeview
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
-from foldersynclib.tooltip import TooltipWrapper
+from foldersynclib.tooltip import TooltipWrapper, TooltipMenuWrapper
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT, IM_PREV, IM_SYNC, IM_EXPAND, \
     IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH
@@ -202,6 +202,12 @@ class Sync(Tk):
                               state="disabled", command=self.synchronise)
         self.menu.add_command(image=self.img_about, compound="center",
                               command=lambda: About(self))
+        # tooltips
+        wrapper = TooltipMenuWrapper(self.menu)
+        wrapper.add_tooltip(4, _('Preview'))
+        wrapper.add_tooltip(5, _('Sync'))
+        wrapper.add_tooltip(6, _('About'))
+
 
         # sélection chemins
         frame_paths = Frame(self)

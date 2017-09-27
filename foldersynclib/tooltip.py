@@ -125,37 +125,33 @@ class TooltipMenuWrapper:
         self.delay = delay
         self._timer_id = ''
         self.tooltip_text = {}
-        self.tooltip = Tooltip(menu, **kwargs)
+        self.tooltip = Tooltip(menu.master, **kwargs)
         self.tooltip.withdraw()
         self.current_item = None
 
         self.menu.bind('<Motion>', self._on_motion)
         self.menu.bind('<Leave>', lambda e: self.menu.after_cancel(self._timer_id))
 
-    def add_tooltip(self, item, text):
+    def add_tooltip(self, index, text):
         """Add a tooltip with given text to the item."""
-        self.tooltip_text[item] = text
+        self.tooltip_text[str(index)] = text
 
     def _on_motion(self, event):
         """Withdraw tooltip on mouse motion and cancel its appearance."""
         if self.tooltip.winfo_ismapped():
-            x, y = self.menu.winfo_pointerxy()
-            if self.menu.winfo_containing(x, y) != self.tooltip:
-#                if self.tree.identify_row(y - self.tree.winfo_rooty()):
-                self.tooltip.withdraw()
-                self.current_item = None
+            self.tooltip.withdraw()
+            self.current_item = 'none'
         else:
             self.menu.after_cancel(self._timer_id)
+            self.current_item = self.menu.tk.eval("%s index @%i,%i" % (event.widget, event.x, event.y))
             self._timer_id = self.menu.after(self.delay, self.display_tooltip)
 
     def display_tooltip(self):
         """Display the tooltip corresponding to the hovered item."""
-        item = self.menu.identify_row(self.menu.winfo_pointery() - self.menu.winfo_rooty())
-        text = self.tooltip_text.get(item, '')
-        self.current_item = item
-        if text:
+        text = self.tooltip_text.get(self.current_item, '')
+        if text and self.menu.entrycget(self.current_item, 'state') != 'disabled':
             self.tooltip.configure(text=text)
             self.tooltip.deiconify()
             x = self.menu.winfo_pointerx() + 14
-            y = self.menu.winfo_rooty() + self.menu.bbox(item)[1] + self.menu.bbox(item)[3]
+            y = self.menu.master.winfo_rooty() + 5
             self.tooltip.geometry('+%i+%i' % (x, y))
