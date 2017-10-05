@@ -208,7 +208,6 @@ class Sync(Tk):
         wrapper.add_tooltip(5, _('Sync'))
         wrapper.add_tooltip(6, _('About'))
 
-
         # sélection chemins
         frame_paths = Frame(self)
         frame_paths.grid(row=0, sticky="ew", pady=(10, 0))

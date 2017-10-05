@@ -122,11 +122,11 @@ class Confirmation(Toplevel):
         Button(self, text=_("Cancel"),
                command=self.destroy).grid(row=3, column=1, sticky="w",
                                           padx=(4, 10), pady=(4, 10))
-        if show_size:
-            self.compute_size()
         self.wait_visibility()
         self.grab_set()
         self.transient(self.master)
+        if show_size:
+            self.compute_size()
 
     def compute_size(self):
         """Compute and display total size of files to copy/to delete."""
