@@ -77,12 +77,16 @@ class Sync(Tk):
         l = [f for f in listdir(PATH) if match(r"foldersync[0-9]+.pid", f)]
         nbs = []
         for f in l:
-            with open(join(PATH, f)) as fich:
-                old_pid = fich.read().strip()
-            if exists("/proc/%s" % old_pid):
-                nbs.append(int(search(r"[0-9]+", f).group()))
-            else:
+            try:
+                with open(join(PATH, f)) as fich:
+                    old_pid = fich.read().strip()
+            except FileNotFoundError:
                 remove(f)
+            else:
+                if exists("/proc/%s" % old_pid):
+                    nbs.append(int(search(r"[0-9]+", f).group()))
+                else:
+                    remove(f)
         if not nbs:
             i = 0
         else:
