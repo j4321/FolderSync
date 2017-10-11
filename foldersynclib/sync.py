@@ -46,7 +46,7 @@ from webbrowser import open as webopen
 class Sync(Tk):
     """FolderSync main window."""
     def __init__(self):
-        Tk.__init__(self)
+        Tk.__init__(self, className='FolderSync')
         self.title("FolderSync")
         self.geometry("%ix%i" % (self.winfo_screenwidth(), self.winfo_screenheight()))
         self.protocol("WM_DELETE_WINDOW", self.quitter)
