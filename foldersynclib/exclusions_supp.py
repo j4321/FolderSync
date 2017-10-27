@@ -25,7 +25,7 @@ from tkinter.ttk import Frame, Button, Style
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.constantes import CONFIG, IM_OPEN, IM_DOC, IM_SUPP
 from foldersynclib.constantes import save_config, askdirectories, askfiles
-from os.path import dirname
+from os.path import dirname, exists
 from re import split
 
 
@@ -67,6 +67,7 @@ class ExclusionsSupp(Toplevel):
         self.listbox = Listbox(listbox_frame, highlightthickness=0,
                                listvariable=self.listvar)
         self.listbox.grid(sticky="eswn")
+        self.listbox.selection_clear(0, 'end')
 
         scroll_x = Scrollbar(frame, orient="horizontal",
                              command=self.listbox.xview)
@@ -93,8 +94,11 @@ class ExclusionsSupp(Toplevel):
         except TclError:
             # no item selected
             path = self.last_path
-        docs = askfiles(path)
-        if docs[0]:
+        if exists(path):
+            docs = askfiles(path)
+        else:
+            docs = askfiles('')
+        if docs and docs[0]:
             for d in docs:
                 d = d.replace(" ", "\ ")
                 if d not in self.exclude_list:
@@ -108,8 +112,11 @@ class ExclusionsSupp(Toplevel):
         except TclError:
             # no item selected
             path = self.last_path
-        dirs = askdirectories(path)
-        if dirs[0]:
+        if exists(path):
+            dirs = askdirectories(path)
+        else:
+            dirs = askdirectories('')
+        if dirs and dirs[0]:
             for d in dirs:
                 d = d.replace(" ", "\ ")
                 if d not in self.exclude_list:
