@@ -65,7 +65,7 @@ class ExclusionsSupp(Toplevel):
                                   CONFIG.get("Defaults", "exclude_supp"))
 
         self.listbox = Listbox(listbox_frame, highlightthickness=0,
-                               listvariable=self.listvar)
+                               listvariable=self.listvar, selectmode='extended')
         self.listbox.grid(sticky="eswn")
         self.listbox.selection_clear(0, 'end')
 
@@ -89,11 +89,7 @@ class ExclusionsSupp(Toplevel):
         self.geometry("500x400")
 
     def add_doc(self):
-        try:
-            path = self.listbox.selection_get()
-        except TclError:
-            # no item selected
-            path = self.last_path
+        path = self.listbox.get('active')
         if exists(path):
             docs = askfiles(path)
         else:
@@ -107,11 +103,7 @@ class ExclusionsSupp(Toplevel):
             self.listvar.set(" ".join(self.exclude_list))
 
     def add_dir(self):
-        try:
-            path = self.listbox.selection_get()
-        except TclError:
-            # no item selected
-            path = self.last_path
+        path = self.listbox.get('active')
         if exists(path):
             dirs = askdirectories(path)
         else:
@@ -126,11 +118,10 @@ class ExclusionsSupp(Toplevel):
 
     def rem(self):
         sel = self.listbox.curselection()
-        if sel:
-            sel = sel[0]
-            txt = self.listbox.get(sel)
+        for index in reversed(sel):
+            txt = self.listbox.get(index)
             self.exclude_list.remove(txt.replace(" ", "\ "))
-            self.listbox.delete(sel)
+            self.listbox.delete(index)
 
     def quitter(self):
         CONFIG.set("Defaults", "exclude_supp", " ".join(self.exclude_list))

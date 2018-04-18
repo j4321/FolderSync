@@ -92,7 +92,10 @@ class TooltipWrapper:
             if not self.widget.winfo_containing(x, y) in [self.widget, self.tooltip]:
                 self.tooltip.withdraw()
         else:
-            self.widget.after_cancel(self._timer_id)
+            try:
+                self.widget.after_cancel(self._timer_id)
+            except ValueError:
+                pass
 
     def _on_leave_tooltip(self, event):
         x, y = self.widget.winfo_pointerxy()
@@ -130,7 +133,13 @@ class TooltipMenuWrapper:
         self.current_item = None
 
         self.menu.bind('<Motion>', self._on_motion)
-        self.menu.bind('<Leave>', lambda e: self.menu.after_cancel(self._timer_id))
+        self.menu.bind('<Leave>', self._on_leave)
+
+    def _on_leave(self, event):
+        try:
+            self.menu.after_cancel(self._timer_id)
+        except ValueError:
+            pass
 
     def add_tooltip(self, index, text):
         """Add a tooltip with given text to the item."""
