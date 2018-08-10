@@ -151,7 +151,10 @@ class TooltipMenuWrapper:
             self.tooltip.withdraw()
             self.current_item = 'none'
         else:
-            self.menu.after_cancel(self._timer_id)
+            try:
+                self.menu.after_cancel(self._timer_id)
+            except ValueError:
+                pass
             self.current_item = self.menu.tk.eval("%s index @%i,%i" % (event.widget, event.x, event.y))
             self._timer_id = self.menu.after(self.delay, self.display_tooltip)
 
