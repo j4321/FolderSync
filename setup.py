@@ -20,6 +20,4 @@ setup(name = "FolderSync",
 					("/usr/share/applications", ["foldersync.desktop"])],
 	  scripts = ["foldersync"],
 	  long_description = """FolderSync is a utility to keep your backups up to date. You can visualise the differences between your data and your backup and choose what will be copied and what will be suppressed. The frequent synchronisation paths can be saved as favorites.""",
-	  requires = ["os", "sys", "subprocess", "threading", "queue", "tkinter",
-                  "configparser", "psutil"]
-)
+	  install_requires = ["psutil"])
