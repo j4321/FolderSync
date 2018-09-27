@@ -25,6 +25,7 @@ from tkinter import PhotoImage
 from tkinter.ttk import Treeview, Style
 from foldersynclib.constantes import IM_CHECKED, IM_UNCHECKED, IM_TRISTATE
 
+
 class CheckboxTreeview(Treeview):
     """
         Treeview widget with checkboxes left of each item.

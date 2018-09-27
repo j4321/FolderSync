@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-# -*- coding:Utf-8 -*-
+# -*- coding:utf-8 -*-
 """
 FolderSync - Folder synchronization software
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
@@ -17,25 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Main
+Version
 """
 
-
-import os
-from foldersynclib.constantes import save_config, LOG_COPIE, LOG_SUPP
-from foldersynclib.sync import Sync
-
-try:
-    sync = Sync()
-    sync.mainloop()
-finally:
-    save_config()
-    # delete logs
-    if os.path.exists(LOG_COPIE):
-        os.remove(LOG_COPIE)
-    if os.path.exists(LOG_SUPP):
-        os.remove(LOG_SUPP)
-    try:
-        sync.unlink()
-    except Exception:
-        pass
+__version__ = "1.0.0"

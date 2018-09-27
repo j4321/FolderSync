@@ -20,33 +20,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Main GUI
 """
 
-# TODO: tester os.scandir
-
 from os.path import join, splitext, exists, isdir, islink, isfile, getmtime, abspath, commonpath
-from os import listdir, chdir, getpid, remove, unlink
-from re import split
+from os import scandir, listdir, chdir, getpid, remove, unlink
+from re import split, search, match
 from threading import Thread
 from queue import Queue
 from subprocess import run, PIPE
-from tkinter import Tk, PhotoImage, Menu, BooleanVar
+from tkinter import Tk, PhotoImage, Menu, BooleanVar, StringVar
 from tkinter.ttk import Label, Button, PanedWindow, Entry, Style, Frame, Progressbar
-from tkinter.messagebox import showerror, askokcancel, showwarning
+from tkinter.messagebox import showerror, askokcancel, showwarning, showinfo
 from foldersynclib.checkboxtreeview import CheckboxTreeview
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
+from foldersynclib.tooltip import TooltipWrapper, TooltipMenuWrapper
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT, IM_PREV, IM_SYNC, IM_EXPAND, \
-    IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger
+    IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH
 from foldersynclib.confirmation import Confirmation
 from foldersynclib.about import About
 from foldersynclib.exclusions_copie import ExclusionsCopie
 from foldersynclib.exclusions_supp import ExclusionsSupp
 from datetime import datetime
-import re
+from webbrowser import open as webopen
 
 
 class Sync(Tk):
+    """FolderSync main window."""
     def __init__(self):
-        Tk.__init__(self)
+        Tk.__init__(self, className='FolderSync')
         self.title("FolderSync")
         self.geometry("%ix%i" % (self.winfo_screenwidth(), self.winfo_screenheight()))
         self.protocol("WM_DELETE_WINDOW", self.quitter)
@@ -74,15 +74,15 @@ class Sync(Tk):
         self.err_supp = False
 
         # --- init log files
-        l = [f for f in listdir('/tmp') if re.match(r"foldersync[0-9]+.pid", f)]
+        l = [f for f in listdir(PATH) if match(r"foldersync[0-9]+.pid", f)]
         nbs = []
         for f in l:
-            with open(join('/tmp', f)) as fich:
+            with open(join(PATH, f)) as fich:
                 old_pid = fich.read().strip()
             if exists("/proc/%s" % old_pid):
-                nbs.append(int(re.search(r"[0-9]+", f).group()))
+                nbs.append(int(search(r"[0-9]+", f).group()))
             else:
-                remove(f)
+                remove(join(PATH, f))
         if not nbs:
             i = 0
         else:
@@ -99,8 +99,8 @@ class Sync(Tk):
         self.logger_copie = setup_logger("copie", self.log_copie)
         self.logger_supp = setup_logger("supp", self.log_supp)
         date = datetime.now().strftime('%d/%m/%Y %H:%M')
-        self.logger_copie.info("\n###  %s  ###\n" % date)
-        self.logger_supp.info("\n###  %s  ###\n" % date)
+        self.logger_copie.info("###  %s  ###\n" % date)
+        self.logger_supp.info("###  %s  ###\n" % date)
 
         # --- filenames and extensions that will not be copied
         exclude_list = split(r'(?<!\\) ',
@@ -152,9 +152,9 @@ class Sync(Tk):
         # emplacements favoris
         self.menu_fav = Menu(self.menu, tearoff=False)
         self.menu_fav_del = Menu(self.menu_fav, tearoff=False)
-        self.menu_fav.add_command(label="Ajouter", image=self.img_plus,
+        self.menu_fav.add_command(label=_("Add"), image=self.img_plus,
                                   compound="left", command=self.add_fav)
-        self.menu_fav.add_cascade(label="Supprimer", image=self.img_moins,
+        self.menu_fav.add_cascade(label=_("Remove"), image=self.img_moins,
                                   compound="left", menu=self.menu_fav_del)
         for ch_o, ch_s in FAVORIS:
             label = "%s -> %s" % (ch_o, ch_s)
@@ -167,28 +167,46 @@ class Sync(Tk):
 
         # accès aux fichiers log
         menu_log = Menu(self.menu, tearoff=False)
-        menu_log.add_command(label="Copie", command=self.open_log_copie)
-        menu_log.add_command(label="Suppression", command=self.open_log_suppression)
+        menu_log.add_command(label=_("Copy"), command=self.open_log_copie)
+        menu_log.add_command(label=_("Removal"), command=self.open_log_suppression)
 
         # paramètres, préférences
         menu_params = Menu(self.menu, tearoff=False)
         self.copy_links = BooleanVar(self, value=CONFIG.getboolean("Defaults", "copy_links"))
-        menu_params.add_checkbutton(label="Copier les liens",
+        self.show_size = BooleanVar(self, value=CONFIG.getboolean("Defaults", "show_size"))
+        menu_params.add_checkbutton(label=_("Copy links"),
                                     variable=self.copy_links,
                                     command=self.toggle_copy_links)
-        menu_params.add_command(label="Exclusions copie", command=self.exclusion_copie)
-        menu_params.add_command(label="Exclusions supp", command=self.exclusion_supp)
+        menu_params.add_checkbutton(label=_("Show total size"),
+                                    variable=self.show_size,
+                                    command=self.toggle_show_size)
+        self.langue = StringVar(self, CONFIG.get("Defaults", "language"))
+        menu_lang = Menu(menu_params, tearoff=False)
+        menu_lang.add_radiobutton(label="English", value="en",
+                                  variable=self.langue,
+                                  command=self.change_language)
+        menu_lang.add_radiobutton(label="Français", value="fr",
+                                  variable=self.langue,
+                                  command=self.change_language)
+        menu_params.add_cascade(label=_("Language"), menu=menu_lang)
+        menu_params.add_command(label=_("Exclude from copy"), command=self.exclusion_copie)
+        menu_params.add_command(label=_("Exclude from removal"), command=self.exclusion_supp)
 
-        self.menu.add_cascade(label="Récents", menu=self.menu_recent)
-        self.menu.add_cascade(label="Favoris", menu=self.menu_fav)
-        self.menu.add_cascade(label="Log", menu=menu_log)
-        self.menu.add_cascade(label="Paramètres", menu=menu_params)
+        self.menu.add_cascade(label=_("Recents"), menu=self.menu_recent)
+        self.menu.add_cascade(label=_("Favorites"), menu=self.menu_fav)
+        self.menu.add_cascade(label=_("Log"), menu=menu_log)
+        self.menu.add_cascade(label=_("Settings"), menu=menu_params)
         self.menu.add_command(image=self.img_prev, compound="center",
                               command=self.list_files_to_sync)
         self.menu.add_command(image=self.img_sync, compound="center",
                               state="disabled", command=self.synchronise)
         self.menu.add_command(image=self.img_about, compound="center",
                               command=lambda: About(self))
+        # tooltips
+        wrapper = TooltipMenuWrapper(self.menu)
+        wrapper.add_tooltip(4, _('Preview'))
+        wrapper.add_tooltip(5, _('Sync'))
+        wrapper.add_tooltip(6, _('About'))
 
         # sélection chemins
         frame_paths = Frame(self)
@@ -205,7 +223,7 @@ class Sync(Tk):
         f2.columnconfigure(1, weight=1)
 
         ## chemin vers original
-        Label(f1, text="Original").grid(row=0, column=0, padx=(10, 4))
+        Label(f1, text=_("Original")).grid(row=0, column=0, padx=(10, 4))
         self.entry_orig = Entry(f1)
         self.entry_orig.grid(row=0, column=1, sticky="ew", padx=(4, 2))
         self.b_open_orig = Button(f1, image=self.img_open,
@@ -213,25 +231,13 @@ class Sync(Tk):
                                   command=self.open_orig)
         self.b_open_orig.grid(row=0, column=2, padx=(1, 8))
         ## chemin vers sauvegarde
-        Label(f2, text="Sauvegarde").grid(row=0, column=0, padx=(8, 4))
+        Label(f2, text=_("Backup")).grid(row=0, column=0, padx=(8, 4))
         self.entry_sauve = Entry(f2)
         self.entry_sauve.grid(row=0, column=1, sticky="ew", padx=(4, 2))
         self.b_open_sauve = Button(f2, image=self.img_open, width=2,
                                    style="folder.TButton",
                                    command=self.open_sauve)
         self.b_open_sauve.grid(row=0, column=5, padx=(1, 10))
-
-#        self.b_prev = Button(frame_paths, image=self.img_prev,
-#                             command=self.list_files_to_sync)
-#        self.b_prev.grid(row=1, column=4, padx=4)
-#
-#        self.b_sync = Button(frame_paths, image=self.img_sync,
-#                             command=self.synchronise)
-#        self.b_sync.grid(row=1, column=5, padx=(4, 10))
-#        self.b_sync.state(("disabled", ))
-#        self.b_prev = Button(self, image=self.img_prev,
-#                             command=self.list_files_to_sync)
-#        self.b_prev.grid(row=1, sticky="ew", pady=(4, 10), padx=10)
 
         paned = PanedWindow(self, orient='horizontal')
         paned.grid(row=2, sticky="eswn")
@@ -250,7 +256,7 @@ class Sync(Tk):
         f_left.columnconfigure(2, weight=1)
         f_left.grid(row=2, columnspan=2, pady=(4, 2), padx=(10, 4), sticky="ew")
 
-        Label(f_left, text="À copier").grid(row=0, column=2)
+        Label(f_left, text=_("To copy")).grid(row=0, column=2)
         frame_copie = Frame(frame_left)
         frame_copie.rowconfigure(0, weight=1)
         frame_copie.columnconfigure(0, weight=1)
@@ -261,11 +267,13 @@ class Sync(Tk):
         self.b_expand_copie = Button(f_left, image=self.img_expand,
                                      style="folder.TButton",
                                      command=self.tree_copie.expand_all)
+        TooltipWrapper(self.b_expand_copie, text=_("Expand all"))
         self.b_expand_copie.grid(row=0, column=0)
         self.b_expand_copie.state(("disabled", ))
         self.b_collapse_copie = Button(f_left, image=self.img_collapse,
                                        style="folder.TButton",
                                        command=self.tree_copie.collapse_all)
+        TooltipWrapper(self.b_collapse_copie, text=_("Collapse all"))
         self.b_collapse_copie.grid(row=0, column=1, padx=4)
         self.b_collapse_copie.state(("disabled", ))
         self.tree_copie.tag_configure("warning", foreground="red")
@@ -296,7 +304,7 @@ class Sync(Tk):
         f_right = Frame(frame_right)
         f_right.columnconfigure(2, weight=1)
         f_right.grid(row=2, columnspan=2, pady=(4, 2), padx=(4, 10), sticky="ew")
-        Label(f_right, text="À supprimer").grid(row=0, column=2)
+        Label(f_right, text=_("To remove")).grid(row=0, column=2)
         frame_supp = Frame(frame_right)
         frame_supp.rowconfigure(0, weight=1)
         frame_supp.columnconfigure(0, weight=1)
@@ -306,11 +314,13 @@ class Sync(Tk):
         self.b_expand_supp = Button(f_right, image=self.img_expand,
                                     style="folder.TButton",
                                     command=self.tree_supp.expand_all)
+        TooltipWrapper(self.b_expand_supp, text=_("Expand all"))
         self.b_expand_supp.grid(row=0, column=0)
         self.b_expand_supp.state(("disabled", ))
         self.b_collapse_supp = Button(f_right, image=self.img_collapse,
                                       style="folder.TButton",
                                       command=self.tree_supp.collapse_all)
+        TooltipWrapper(self.b_collapse_supp, text=_("Collapse all"))
         self.b_collapse_supp.grid(row=0, column=1, padx=4)
         self.b_collapse_supp.state(("disabled", ))
         self.tree_supp.grid(row=0, column=0, sticky="eswn")
@@ -328,14 +338,7 @@ class Sync(Tk):
                             padx=(4, 10), pady=4)
         self.pbar_supp.state(("disabled", ))
 
-
-#        # lancer synchronisation
-#        self.b_sync = Button(self, image=self.img_sync,
-#                             command=self.synchronise)
-#        self.b_sync.grid(row=3, sticky="ew", pady=(4, 10), padx=10)
-#        self.b_sync.state(("disabled", ))
-
-        # bindings
+        # --- bindings
         self.entry_orig.bind("<Key-Return>", self.list_files_to_sync)
         self.entry_sauve.bind("<Key-Return>", self.list_files_to_sync)
 
@@ -364,16 +367,20 @@ class Sync(Tk):
     def toggle_copy_links(self):
         CONFIG.set("Defaults", "copy_links", str(self.copy_links.get()))
 
+    def toggle_show_size(self):
+        CONFIG.set("Defaults", "show_size", str(self.show_size.get()))
+
     def open_log_copie(self):
-        run(["xdg-open", self.log_copie])
+        webopen(self.log_copie)
 
     def open_log_suppression(self):
-        run(["xdg-open", self.log_supp])
+        webopen(self.log_supp)
 
     def quitter(self):
         rep = True
         if self.is_running_copie or self.is_running_supp:
-            rep = askokcancel("Confirmation", "Une synchronisation est en cours, êtes-vous sur de vouloir quitter ?")
+            rep = askokcancel(_("Confirmation"),
+                              _("A synchronization is ongoing, do you really want to quit?"))
         if rep:
             self.destroy()
 
@@ -427,30 +434,37 @@ class Sync(Tk):
         copy_links = self.copy_links.get()
         excl_supp = [path for path in self.exclude_path_supp if commonpath([path, sauvegarde]) == sauvegarde]
 
+        def get_name(elt):
+            return elt.name.lower()
+
+        def lower(char):
+            return char.lower()
+
         def arbo(tree, parent, n):
             """ affiche l'arborescence complète de parent et renvoie la longueur
                 maximale des items (pour gérer la scrollbar horizontale) """
             m = 0
-            if isdir(parent):
-                try:
-                    l = listdir(parent)
-                except Exception as e:
-                    errors.append(str(e))
-                    l = []
-                l.sort(key=lambda x: x.lower())
+            try:
+                with scandir(parent) as content:
+                    l = sorted(content, key=get_name)
                 for item in l:
-                    chemin = join(parent, item)
-                    if islink(chemin):
+                    chemin = item.path
+                    nom = item.name
+                    if item.is_symlink():
                         if copy_links:
-                            tree.insert(parent, 'end', chemin, text=item,
+                            tree.insert(parent, 'end', chemin, text=nom,
                                         tags=("whole", "link"))
-                            m = max(m, len(item) * 9 + 20 * (n + 1))
-                    elif ((item not in self.exclude_names) and
-                          (splitext(item)[-1] not in self.exclude_ext)):
-                        tree.insert(parent, 'end', chemin, text=item, tags=("whole", ))
-                        m = max(m, len(item) * 9 + 20 * (n + 1))
-                        if isdir(chemin):
+                            m = max(m, len(nom) * 9 + 20 * (n + 1))
+                    elif ((nom not in self.exclude_names) and
+                          (splitext(nom)[-1] not in self.exclude_ext)):
+                        tree.insert(parent, 'end', chemin, text=nom, tags=("whole", ))
+                        m = max(m, len(nom) * 9 + 20 * (n + 1))
+                        if item.is_dir():
                             m = max(m, arbo(tree, chemin, n + 1))
+            except NotADirectoryError:
+                pass
+            except Exception as e:
+                errors.append(str(e))
             return m
 
         def aux(orig, sauve, n, search_supp):
@@ -568,17 +582,18 @@ class Sync(Tk):
         return errors
 
     def show_warning(self, event):
-        x, y = event.x, event.y
-        elem = event.widget.identify("element", x, y)
-        if elem == "padding":
-            orig = self.tree_copie.identify_row(y)
-            sauve = orig.replace(self.original, self.sauvegarde)
-            showwarning("Attention",
-                        "%s et %s ne sont pas de même nature (dossier/fichier/lien)" % (orig, sauve),
-                        master=self)
+        if "disabled" not in self.b_open_orig.state():
+            x, y = event.x, event.y
+            elem = event.widget.identify("element", x, y)
+            if elem == "padding":
+                orig = self.tree_copie.identify_row(y)
+                sauve = orig.replace(self.original, self.sauvegarde)
+                showwarning(_("Warning"),
+                            _("%(original)s and %(backup)s are not of the same kind (folder/file/link)") % {'original': orig, 'backup': sauve},
+                            master=self)
 
     def list_files_to_sync(self, event=None):
-        """ display in a treeview the file to copy and the one to delete """
+        """Display in a treeview the file to copy and the one to delete."""
         self.pbar_copie.configure(value=0)
         self.pbar_supp.configure(value=0)
         self.sauvegarde = self.entry_sauve.get()
@@ -620,15 +635,18 @@ class Sync(Tk):
                     self.b_collapse_supp.state(("disabled", ))
                     self.b_expand_supp.state(("disabled", ))
                 if err:
-                    showerror("Erreurs", "\n".join(err))
-                run(["notify-send", "-i", IM_ICON, "FolderSync", "Scan is finished."])
+                    showerror(_("Errors"), "\n".join(err), master=self)
+                run(["notify-send", "-i", IM_ICON, "FolderSync", _("Scan is finished.")])
                 warnings = self.tree_copie.tag_has('warning')
                 if warnings:
-                    showwarning("Attention", "Certains éléments à copier (en rouge) ne sont pas de même nature sur l'original et la sauvegarde")
+                    showwarning(_("Warning"),
+                                _("Some elements to copy (in red) are not of the same kind on the original and the backup."),
+                                master=self)
             else:
-                showerror("Erreur", "Chemin invalide !")
+                showerror(_("Error"), _("Invalid path!"), master=self)
 
     def efface_tree(self):
+        """Clear both trees."""
         c = self.tree_copie.get_children("")
         for item in c:
             self.tree_copie.delete(item)
@@ -641,7 +659,7 @@ class Sync(Tk):
         self.b_expand_supp.state(("disabled", ))
 
     def toggle_state_gui(self):
-        """ toggle the state (normal/disabled) of key elements of the GUI """
+        """Toggle the state (normal/disabled) of key elements of the GUI."""
         if "disabled" in self.b_open_orig.state():
             state = "!disabled"
             for i in range(7):
@@ -654,8 +672,6 @@ class Sync(Tk):
         self.tree_supp.state((state, ))
         self.entry_orig.state((state, ))
         self.entry_sauve.state((state, ))
-#        self.b_sync.state((state, ))
-#        self.b_prev.state((state, ))
         self.b_expand_copie.state((state, ))
         self.b_collapse_copie.state((state, ))
         self.b_expand_supp.state((state, ))
@@ -664,24 +680,25 @@ class Sync(Tk):
         self.b_open_sauve.state((state, ))
 
     def update_pbar(self):
-        """ dislay the progress of the copy and deletion and put the GUI back in
-            normal state once both processes are done. """
+        """
+        Dislay the progress of the copy and deletion and put the GUI back in
+        normal state once both processes are done.
+        """
         if not self.is_running_copie and not self.is_running_supp:
-            run(["notify-send", "-i", IM_ICON, "FolderSync", "Sync is finished."])
+            run(["notify-send", "-i", IM_ICON, "FolderSync", _("Sync is finished.")])
             self.toggle_state_gui()
             self.pbar_copie.configure(value=self.pbar_copie.cget("maximum"))
             self.pbar_supp.configure(value=self.pbar_supp.cget("maximum"))
-#            self.b_sync.state(("disabled", ))
             self.menu.entryconfigure(5, state="disabled")
             self.configure(cursor="")
             self.efface_tree()
             msg = ""
             if self.err_copie:
-                msg += "Il y a eu des erreurs lors de la copie, voir %s pour plus de détails.\n" % self.log_copie
+                msg += _("There were errors during the copy, see %(file)s for more details.\n") % {'file': self.log_copie}
             if self.err_supp:
-                msg += "Il y a eu des erreurs lors de la suppression, voir %s pour plus de détails.\n" % self.log_supp
+                msg += _("There were errors during the removal, see %(file)s for more details.\n") % {'file': self.log_supp}
             if msg:
-                showerror("Erreur", msg, master=self)
+                showerror(_("Error"), msg, master=self)
         else:
             if not self.q_copie.empty():
                 self.pbar_copie.configure(value=self.q_copie.get())
@@ -692,8 +709,7 @@ class Sync(Tk):
 
     @staticmethod
     def get_list(tree):
-        """ return the list of files/folders to copy/delete
-            (depending on the tree)"""
+        """Return the list of files/folders to copy/delete (depending on the tree)."""
         selected = []
 
         def aux(item):
@@ -710,8 +726,10 @@ class Sync(Tk):
         return selected
 
     def synchronise(self):
-        """ display the list of files/folders that will be copied / deleted
-            and launch the copy and deletion if the user validates the sync. """
+        """
+        Display the list of files/folders that will be copied / deleted
+        and launch the copy and deletion if the user validates the sync.
+        """
         # get files to delete and folder to delete if they are empty
         a_supp = self.get_list(self.tree_supp)
         # get files to copy
@@ -721,10 +739,10 @@ class Sync(Tk):
             if ch in a_copier:
                 a_supp_avant_cp.append(ch.replace(self.original, self.sauvegarde))
         if a_supp or a_copier:
-            Confirmation(self, a_copier, a_supp, a_supp_avant_cp, self.original, self.sauvegarde)
+            Confirmation(self, a_copier, a_supp, a_supp_avant_cp, self.original, self.sauvegarde, self.show_size.get())
 
     def copie_supp(self, a_copier, a_supp, a_supp_avant_cp):
-        """ launch sync """
+        """Launch sync."""
         self.toggle_state_gui()
         self.configure(cursor="watch")
         self.update()
@@ -745,17 +763,19 @@ class Sync(Tk):
         self.update_pbar()
 
     def copie(self, a_copier, a_supp_avant_cp):
-        """ copie tous les fichiers/dossiers de a_copier de original vers
-            sauvegarde en utilisant la commande système cp. Les erreurs
-            rencontrées au cours du processus sont inscrites dans
-            ~/.foldersync/copie.log """
+        """
+        Copie tous les fichiers/dossiers de a_copier de original vers
+        sauvegarde en utilisant la commande système cp. Les erreurs
+        rencontrées au cours du processus sont inscrites dans
+        ~/.foldersync/copie.log
+        """
         self.err_copie = False
         orig = abspath(self.original) + "/"
         sauve = abspath(self.sauvegarde) + "/"
         chdir(orig)
-        self.logger_copie.info("\nCopie: %s -> %s\n" % (self.original, self.sauvegarde))
+        self.logger_copie.info(_("Copy: %(original)s -> %(backup)s\n") % {'original': self.original, 'backup': self.sauvegarde})
         n = len(a_supp_avant_cp)
-        self.logger_copie.info("\nSuppression avant copie:")
+        self.logger_copie.info(_("Removal before copy:"))
         for i, ch in zip(range(1, n + 1), a_supp_avant_cp):
             self.logger_copie.info(ch)
             p_copie = run(["rm", "-r", ch], stderr=PIPE)
@@ -764,7 +784,7 @@ class Sync(Tk):
             if err:
                 self.err_copie = True
                 self.logger_copie.error(err.strip())
-        self.logger_copie.info("\nCopie:")
+        self.logger_copie.info(_("Copy:"))
         for i, ch in zip(range(n + 1, n + 1 + len(a_copier)), a_copier):
             ch_o = ch.replace(orig, "")
             self.logger_copie.info("%s -> %s" % (ch_o, sauve))
@@ -777,12 +797,14 @@ class Sync(Tk):
         self.is_running_copie = False
 
     def supp(self, a_supp):
-        """ supprime tous les fichiers/dossiers de a_supp de original vers
-            sauvegarde en utilisant la commande système rm. Les erreurs
-            rencontrées au cours du processus sont inscrites dans
-            ~/.foldersync/suppression.log """
+        """
+        Supprime tous les fichiers/dossiers de a_supp de original vers
+        sauvegarde en utilisant la commande système rm. Les erreurs
+        rencontrées au cours du processus sont inscrites dans
+        ~/.foldersync/suppression.log.
+        """
         self.err_supp = False
-        self.logger_supp.info("\nSuppression: %s -> %s\n" % (self.original, self.sauvegarde))
+        self.logger_supp.info(_("Removal:  %(original)s -> %(backup)s\n") % {'original': self.original, 'backup': self.sauvegarde})
         for i, ch in enumerate(a_supp):
             self.logger_supp.info(ch)
             p_supp = run(["rm", "-r", ch], stderr=PIPE)
@@ -796,3 +818,9 @@ class Sync(Tk):
     def unlink(self):
         """Unlink pidfile."""
         unlink(self.pidfile)
+
+    def change_language(self):
+        """Change app language."""
+        CONFIG.set("Defaults", "language", self.langue.get())
+        showinfo(_("Information"),
+                 _("The language setting will take effect after restarting the application"))
