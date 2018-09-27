@@ -637,9 +637,9 @@ class Sync(Tk):
                 if err:
                     showerror(_("Errors"), "\n".join(err), master=self)
                 try:
-					run(["notify-send", "-i", IM_ICON, "FolderSync", _("Scan is finished.")])
-				except OSError:
-					pass
+                    run(["notify-send", "-i", IM_ICON, "FolderSync", _("Scan is finished.")])
+                except OSError:
+                    pass
                 warnings = self.tree_copie.tag_has('warning')
                 if warnings:
                     showwarning(_("Warning"),
@@ -688,10 +688,10 @@ class Sync(Tk):
         normal state once both processes are done.
         """
         if not self.is_running_copie and not self.is_running_supp:
-			try:
-				run(["notify-send", "-i", IM_ICON, "FolderSync", _("Sync is finished.")])
-			except OSError:
-				pass
+            try:
+                run(["notify-send", "-i", IM_ICON, "FolderSync", _("Sync is finished.")])
+            except OSError:
+                pass
             self.toggle_state_gui()
             self.pbar_copie.configure(value=self.pbar_copie.cget("maximum"))
             self.pbar_supp.configure(value=self.pbar_supp.cget("maximum"))
