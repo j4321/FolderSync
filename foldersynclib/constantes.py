@@ -32,7 +32,6 @@ import locale
 from math import log, floor
 import gettext
 
-
 # --- fichier de config
 PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
 
@@ -112,8 +111,14 @@ if LANGUE not in ["en", "fr"]:
         LANGUE = "en_US"
     CONFIG.set("Defaults", "language", LANGUE[:2])
 
-LANG = gettext.translation(APP_NAME,
-                           languages=[LANGUE], fallback=True)
+try:
+	LANG = gettext.translation(APP_NAME,
+							   languages=[LANGUE])
+except FileNotFoundError:
+	# try local path
+	LANG = gettext.translation(APP_NAME, 
+							   os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale"),
+							   languages=[LANGUE], fallback=True)
 LANG.install()
 
 

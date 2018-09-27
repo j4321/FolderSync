@@ -185,7 +185,7 @@ class Sync(Tk):
         menu_lang.add_radiobutton(label="English", value="en",
                                   variable=self.langue,
                                   command=self.change_language)
-        menu_lang.add_radiobutton(label="French", value="fr",
+        menu_lang.add_radiobutton(label="Français", value="fr",
                                   variable=self.langue,
                                   command=self.change_language)
         menu_params.add_cascade(label=_("Language"), menu=menu_lang)
@@ -636,7 +636,7 @@ class Sync(Tk):
                     self.b_expand_supp.state(("disabled", ))
                 if err:
                     showerror(_("Errors"), "\n".join(err), master=self)
-                run(["notify-send", "-i", IM_ICON, "FolderSync", "Scan is finished."])
+                run(["notify-send", "-i", IM_ICON, "FolderSync", _("Scan is finished.")])
                 warnings = self.tree_copie.tag_has('warning')
                 if warnings:
                     showwarning(_("Warning"),
@@ -685,7 +685,7 @@ class Sync(Tk):
         normal state once both processes are done.
         """
         if not self.is_running_copie and not self.is_running_supp:
-            run(["notify-send", "-i", IM_ICON, "FolderSync", "Sync is finished."])
+            run(["notify-send", "-i", IM_ICON, "FolderSync", _("Sync is finished.")])
             self.toggle_state_gui()
             self.pbar_copie.configure(value=self.pbar_copie.cget("maximum"))
             self.pbar_supp.configure(value=self.pbar_supp.cget("maximum"))

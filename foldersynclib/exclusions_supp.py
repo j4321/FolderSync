@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FolderSync - Folder synchronization software
-Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
 
 FolderSync is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
