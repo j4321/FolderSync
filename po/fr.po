@@ -47,7 +47,7 @@ msgstr "À propos de FolderSync"
 
 #: foldersynclib/about.py:44
 msgid "Folder synchronization software"
-msgstr "Logiciel de synchronisation de dossier"
+msgstr "Logiciel de synchronisation de dossiers"
 
 #: foldersynclib/about.py:47 foldersynclib/about.py:71
 msgid "License"
