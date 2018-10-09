@@ -27,10 +27,11 @@ import os
 from sys import platform
 from configparser import ConfigParser
 from tkinter import filedialog
-from subprocess import check_output, CalledProcessError
+from subprocess import check_output, CalledProcessError, Popen
 import locale
 from math import log, floor
 import gettext
+from webbrowser import open as webopen
 
 # --- fichier de config
 PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
@@ -116,7 +117,7 @@ try:
 							   languages=[LANGUE])
 except FileNotFoundError:
 	# try local path
-	LANG = gettext.translation(APP_NAME, 
+	LANG = gettext.translation(APP_NAME,
 							   os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale"),
 							   languages=[LANGUE], fallback=True)
 LANG.install()
@@ -242,6 +243,7 @@ def askfiles(initialdir, title="Séléctionner", **options):
         return filedialog.askopenfilenames(title=title, initialdir=initialdir,
                                        **options)
 
+# --- misc
 
 def save_config():
     # save recent files
@@ -262,3 +264,14 @@ def save_config():
     CONFIG.set("Favoris", "sauve", ", ".join(sauve))
     with open(PATH_CONFIG, 'w') as fichier:
         CONFIG.write(fichier)
+
+
+def open_file(filepath):
+    if platform.startswith('linux'):
+        Popen(['xdg-open', filepath])
+    elif platform.startswith('darwin'):
+        Popen(['open', filepath])
+    elif platform.startswith('win'):
+        os.startfile(filepath)
+    else:
+        webopen(filepath)
