@@ -99,8 +99,8 @@ class Sync(Tk):
         self.logger_copie = setup_logger("copie", self.log_copie)
         self.logger_supp = setup_logger("supp", self.log_supp)
         date = datetime.now().strftime('%d/%m/%Y %H:%M')
-        self.logger_copie.info("###  %s  ###\n" % date)
-        self.logger_supp.info("###  %s  ###\n" % date)
+        self.logger_copie.info("\n###  %s  ###\n" % date)
+        self.logger_supp.info("\n###  %s  ###\n" % date)
 
         # --- filenames and extensions that will not be copied
         exclude_list = split(r'(?<!\\) ',
