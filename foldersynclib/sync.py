@@ -34,13 +34,13 @@ from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.tooltip import TooltipWrapper, TooltipMenuWrapper
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT, IM_PREV, IM_SYNC, IM_EXPAND, \
-    IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH
+    IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH, \
+    open_file, notification_send
 from foldersynclib.confirmation import Confirmation
 from foldersynclib.about import About
 from foldersynclib.exclusions_copie import ExclusionsCopie
 from foldersynclib.exclusions_supp import ExclusionsSupp
 from datetime import datetime
-from webbrowser import open as webopen
 
 
 class Sync(Tk):
@@ -67,8 +67,8 @@ class Sync(Tk):
 
         self.original = ""
         self.sauvegarde = ""
-        # liste des fichiers/dossiers à supprimer avant de lancer la copie car
-        # ils sont de nature différente sur l'original et la sauvegarde
+        # list of files / folders to delete before starting the copy because
+        # they are not of the same type on the original and the backup
         self.pb_chemins = []
         self.err_copie = False
         self.err_supp = False
@@ -99,8 +99,8 @@ class Sync(Tk):
         self.logger_copie = setup_logger("copie", self.log_copie)
         self.logger_supp = setup_logger("supp", self.log_supp)
         date = datetime.now().strftime('%d/%m/%Y %H:%M')
-        self.logger_copie.info("###  %s  ###\n" % date)
-        self.logger_supp.info("###  %s  ###\n" % date)
+        self.logger_copie.info("\n###  %s  ###\n" % date)
+        self.logger_supp.info("\n###  %s  ###\n" % date)
 
         # --- filenames and extensions that will not be copied
         exclude_list = split(r'(?<!\\) ',
@@ -124,7 +124,7 @@ class Sync(Tk):
 
         self.q_copie = Queue()
         self.q_supp = Queue()
-        # True si une copie / suppression est en cours
+        # True if a copy / deletion is running
         self.is_running_copie = False
         self.is_running_supp = False
 
@@ -140,7 +140,7 @@ class Sync(Tk):
         self.menu = Menu(self, tearoff=False)
         self.configure(menu=self.menu)
 
-        # emplacements récents
+        # -------- recents
         self.menu_recent = Menu(self.menu, tearoff=False)
         if RECENT:
             for ch_o, ch_s in RECENT:
@@ -149,7 +149,7 @@ class Sync(Tk):
         else:
             self.menu.entryconfigure(0, state="disabled")
 
-        # emplacements favoris
+        # -------- favorites
         self.menu_fav = Menu(self.menu, tearoff=False)
         self.menu_fav_del = Menu(self.menu_fav, tearoff=False)
         self.menu_fav.add_command(label=_("Add"), image=self.img_plus,
@@ -165,12 +165,12 @@ class Sync(Tk):
         if not FAVORIS:
             self.menu_fav.entryconfigure(1, state="disabled")
 
-        # accès aux fichiers log
+        # -------- log files
         menu_log = Menu(self.menu, tearoff=False)
         menu_log.add_command(label=_("Copy"), command=self.open_log_copie)
         menu_log.add_command(label=_("Removal"), command=self.open_log_suppression)
 
-        # paramètres, préférences
+        # -------- settings
         menu_params = Menu(self.menu, tearoff=False)
         self.copy_links = BooleanVar(self, value=CONFIG.getboolean("Defaults", "copy_links"))
         self.show_size = BooleanVar(self, value=CONFIG.getboolean("Defaults", "show_size"))
@@ -202,13 +202,13 @@ class Sync(Tk):
                               state="disabled", command=self.synchronise)
         self.menu.add_command(image=self.img_about, compound="center",
                               command=lambda: About(self))
-        # tooltips
+        # --- tooltips
         wrapper = TooltipMenuWrapper(self.menu)
         wrapper.add_tooltip(4, _('Preview'))
         wrapper.add_tooltip(5, _('Sync'))
         wrapper.add_tooltip(6, _('About'))
 
-        # sélection chemins
+        # --- path selection
         frame_paths = Frame(self)
         frame_paths.grid(row=0, sticky="ew", pady=(10, 0))
         frame_paths.columnconfigure(0, weight=1)
@@ -222,7 +222,7 @@ class Sync(Tk):
         f1.columnconfigure(1, weight=1)
         f2.columnconfigure(1, weight=1)
 
-        ## chemin vers original
+        # -------- path to original
         Label(f1, text=_("Original")).grid(row=0, column=0, padx=(10, 4))
         self.entry_orig = Entry(f1)
         self.entry_orig.grid(row=0, column=1, sticky="ew", padx=(4, 2))
@@ -230,7 +230,7 @@ class Sync(Tk):
                                   style="folder.TButton",
                                   command=self.open_orig)
         self.b_open_orig.grid(row=0, column=2, padx=(1, 8))
-        ## chemin vers sauvegarde
+        # -------- path to backup
         Label(f2, text=_("Backup")).grid(row=0, column=0, padx=(8, 4))
         self.entry_sauve = Entry(f2)
         self.entry_sauve.grid(row=0, column=1, sticky="ew", padx=(4, 2))
@@ -245,13 +245,13 @@ class Sync(Tk):
         paned.columnconfigure(1, weight=1)
         paned.columnconfigure(0, weight=1)
 
-        # --- côté gauche
+        # --- left side
         frame_left = Frame(paned)
         paned.add(frame_left, weight=1)
         frame_left.rowconfigure(3, weight=1)
         frame_left.columnconfigure(0, weight=1)
 
-        # fichiers à copier
+        # -------- files to copy
         f_left = Frame(frame_left)
         f_left.columnconfigure(2, weight=1)
         f_left.grid(row=2, columnspan=2, pady=(4, 2), padx=(10, 4), sticky="ew")
@@ -294,13 +294,13 @@ class Sync(Tk):
                              padx=(10, 4), pady=4)
         self.pbar_copie.state(("disabled", ))
 
-        # --- côté droit
+        # --- right side
         frame_right = Frame(paned)
         paned.add(frame_right, weight=1)
         frame_right.rowconfigure(3, weight=1)
         frame_right.columnconfigure(0, weight=1)
 
-        # fichiers à supprimer
+        # -------- files to delete
         f_right = Frame(frame_right)
         f_right.columnconfigure(2, weight=1)
         f_right.grid(row=2, columnspan=2, pady=(4, 2), padx=(4, 10), sticky="ew")
@@ -371,10 +371,10 @@ class Sync(Tk):
         CONFIG.set("Defaults", "show_size", str(self.show_size.get()))
 
     def open_log_copie(self):
-        webopen(self.log_copie)
+        open_file(self.log_copie)
 
     def open_log_suppression(self):
-        webopen(self.log_supp)
+        open_file(self.log_supp)
 
     def quitter(self):
         rep = True
@@ -636,10 +636,7 @@ class Sync(Tk):
                     self.b_expand_supp.state(("disabled", ))
                 if err:
                     showerror(_("Errors"), "\n".join(err), master=self)
-                try:
-                    run(["notify-send", "-i", IM_ICON, "FolderSync", _("Scan is finished.")])
-                except OSError:
-                    pass
+                notification_send(_("Scan is finished."))
                 warnings = self.tree_copie.tag_has('warning')
                 if warnings:
                     showwarning(_("Warning"),
@@ -688,10 +685,7 @@ class Sync(Tk):
         normal state once both processes are done.
         """
         if not self.is_running_copie and not self.is_running_supp:
-            try:
-                run(["notify-send", "-i", IM_ICON, "FolderSync", _("Sync is finished.")])
-            except OSError:
-                pass
+            notification_send(_("Sync is finished."))
             self.toggle_state_gui()
             self.pbar_copie.configure(value=self.pbar_copie.cget("maximum"))
             self.pbar_supp.configure(value=self.pbar_supp.cget("maximum"))
