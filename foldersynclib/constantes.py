@@ -27,7 +27,7 @@ import os
 from sys import platform
 from configparser import ConfigParser
 from tkinter import filedialog
-from subprocess import check_output, CalledProcessError, Popen
+from subprocess import check_output, CalledProcessError, Popen, run
 import locale
 from math import log, floor
 import gettext
@@ -242,6 +242,27 @@ def askfiles(initialdir, title="Séléctionner", **options):
     else:
         return filedialog.askopenfilenames(title=title, initialdir=initialdir,
                                        **options)
+
+
+# --- notification
+
+PLYER = True
+try:
+    from plyer import notification
+except ImportError:
+    PLYER = False
+
+
+def notification_send(message):
+    if PLYER:
+        notification.notify(title="FolderSync", message=message,
+                            app_icon=IM_ICON, timeout=20)
+    else:
+        try:
+            run(["notify-send", "-i", IM_ICON, "FolderSync", message])
+        except OSError:
+            pass
+
 
 # --- misc
 

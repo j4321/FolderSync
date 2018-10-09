@@ -35,7 +35,7 @@ from foldersynclib.tooltip import TooltipWrapper, TooltipMenuWrapper
 from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT, IM_PREV, IM_SYNC, IM_EXPAND, \
     IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH, \
-    open_file
+    open_file, notification_send
 from foldersynclib.confirmation import Confirmation
 from foldersynclib.about import About
 from foldersynclib.exclusions_copie import ExclusionsCopie
@@ -636,10 +636,7 @@ class Sync(Tk):
                     self.b_expand_supp.state(("disabled", ))
                 if err:
                     showerror(_("Errors"), "\n".join(err), master=self)
-                try:
-                    run(["notify-send", "-i", IM_ICON, "FolderSync", _("Scan is finished.")])
-                except OSError:
-                    pass
+                notification_send(_("Scan is finished."))
                 warnings = self.tree_copie.tag_has('warning')
                 if warnings:
                     showwarning(_("Warning"),
@@ -688,10 +685,7 @@ class Sync(Tk):
         normal state once both processes are done.
         """
         if not self.is_running_copie and not self.is_running_supp:
-            try:
-                run(["notify-send", "-i", IM_ICON, "FolderSync", _("Sync is finished.")])
-            except OSError:
-                pass
+            notification_send(_("Sync is finished."))
             self.toggle_state_gui()
             self.pbar_copie.configure(value=self.pbar_copie.cget("maximum"))
             self.pbar_supp.configure(value=self.pbar_supp.cget("maximum"))
