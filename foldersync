@@ -22,7 +22,7 @@ Main
 
 
 import os
-from foldersynclib.constantes import save_config, LOG_COPIE, LOG_SUPP
+from foldersynclib.constants import save_config, LOG_COPIE, LOG_SUPP
 from foldersynclib.sync import Sync
 
 try:

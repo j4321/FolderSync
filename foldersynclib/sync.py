@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 """
 FolderSync - Folder synchronization software
-Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
 
 FolderSync is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ from tkinter.messagebox import showerror, askokcancel, showwarning, showinfo
 from foldersynclib.checkboxtreeview import CheckboxTreeview
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
 from foldersynclib.tooltip import TooltipWrapper, TooltipMenuWrapper
-from foldersynclib.constantes import FAVORIS, RECENT, CONFIG, askdirectory, \
+from foldersynclib.constants import FAVORIS, RECENT, CONFIG, askdirectory, \
     IM_OPEN, IM_PLUS, IM_MOINS, IM_ICON, IM_ABOUT, IM_PREV, IM_SYNC, IM_EXPAND, \
     IM_COLLAPSE, LOG_COPIE, LOG_SUPP, PID_FILE, save_config, setup_logger, PATH, \
     open_file, notification_send
@@ -135,7 +135,7 @@ class Sync(Tk):
                              darkcolor="#2758AB")
         self.style.map("TProgressbar", lightcolor=[("disabled", "white")],
                        darkcolor=[("disabled", "gray")])
-        self.style.configure("folder.TButton", padding=1)
+        self.style.configure("folder.TButton", padding=0)
         # --- menu
         self.menu = Menu(self, tearoff=False)
         self.configure(menu=self.menu)
@@ -224,20 +224,24 @@ class Sync(Tk):
 
         # -------- path to original
         Label(f1, text=_("Original")).grid(row=0, column=0, padx=(10, 4))
-        self.entry_orig = Entry(f1)
-        self.entry_orig.grid(row=0, column=1, sticky="ew", padx=(4, 2))
+        f11 = Frame(f1)
+        f11.grid(row=0, column=1, sticky="nsew", padx=(4, 0))
+        self.entry_orig = Entry(f11)
+        self.entry_orig.place(x=1, y=0, bordermode='outside', relwidth=1)
         self.b_open_orig = Button(f1, image=self.img_open,
                                   style="folder.TButton",
                                   command=self.open_orig)
-        self.b_open_orig.grid(row=0, column=2, padx=(1, 8))
+        self.b_open_orig.grid(row=0, column=2, padx=(0, 7))
         # -------- path to backup
         Label(f2, text=_("Backup")).grid(row=0, column=0, padx=(8, 4))
-        self.entry_sauve = Entry(f2)
-        self.entry_sauve.grid(row=0, column=1, sticky="ew", padx=(4, 2))
+        f22 = Frame(f2)
+        f22.grid(row=0, column=1, sticky="nsew", padx=(4, 0))
+        self.entry_sauve = Entry(f22)
+        self.entry_sauve.place(x=1, y=0, bordermode='outside', relwidth=1)
         self.b_open_sauve = Button(f2, image=self.img_open, width=2,
                                    style="folder.TButton",
                                    command=self.open_sauve)
-        self.b_open_sauve.grid(row=0, column=5, padx=(1, 10))
+        self.b_open_sauve.grid(row=0, column=5, padx=(0, 10))
 
         paned = PanedWindow(self, orient='horizontal')
         paned.grid(row=2, sticky="eswn")
@@ -380,7 +384,7 @@ class Sync(Tk):
         rep = True
         if self.is_running_copie or self.is_running_supp:
             rep = askokcancel(_("Confirmation"),
-                              _("A synchronization is ongoing, do you really want to quit?"))
+                              _("A synchronization is ongoing, do you really want to quit?"), parent=self)
         if rep:
             self.destroy()
 
@@ -415,13 +419,13 @@ class Sync(Tk):
         self.list_files_to_sync()
 
     def open_sauve(self):
-        sauvegarde = askdirectory(self.entry_sauve.get())
+        sauvegarde = askdirectory(self.entry_sauve.get(), parent=self)
         if sauvegarde:
             self.entry_sauve.delete(0, "end")
             self.entry_sauve.insert(0, sauvegarde)
 
     def open_orig(self):
-        original = askdirectory(self.entry_orig.get())
+        original = askdirectory(self.entry_orig.get(), parent=self)
         if original:
             self.entry_orig.delete(0, "end")
             self.entry_orig.insert(0, original)

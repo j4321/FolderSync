@@ -23,8 +23,8 @@ ExclusionsSupp
 from tkinter import Toplevel, Listbox, StringVar, PhotoImage, TclError
 from tkinter.ttk import Frame, Button, Style
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
-from foldersynclib.constantes import CONFIG, IM_OPEN, IM_DOC, IM_SUPP
-from foldersynclib.constantes import save_config, askdirectories, askfiles
+from foldersynclib.constants import CONFIG, IM_OPEN, IM_DOC, IM_SUPP
+from foldersynclib.constants import save_config, askdirectories, askfiles
 from os.path import dirname, exists
 from re import split
 
@@ -91,9 +91,9 @@ class ExclusionsSupp(Toplevel):
     def add_doc(self):
         path = self.listbox.get('active')
         if exists(path):
-            docs = askfiles(path)
+            docs = askfiles(path, parent=self)
         else:
-            docs = askfiles('')
+            docs = askfiles('', parent=self)
         if docs and docs[0]:
             for d in docs:
                 d = d.replace(" ", "\ ")
@@ -105,9 +105,9 @@ class ExclusionsSupp(Toplevel):
     def add_dir(self):
         path = self.listbox.get('active')
         if exists(path):
-            dirs = askdirectories(path)
+            dirs = askdirectories(path, parent=self)
         else:
-            dirs = askdirectories('')
+            dirs = askdirectories('', parent=self)
         if dirs and dirs[0]:
             for d in dirs:
                 d = d.replace(" ", "\ ")

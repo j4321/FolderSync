@@ -16,4 +16,15 @@ Optional dependencies:
     * zenity or tkfilebrowser: nicer file dialogs
     * libnotify and a notification server if your desktop environment does not provide one: to be notified when the scan/sync is finished 
 
-Install: sudo python3 setup.py install
+Install
+-------
+
+    ::
+
+        $sudo python3 setup.py install
+
+Run without installing
+----------------------
+
+    ::
+        $python3 foldersync

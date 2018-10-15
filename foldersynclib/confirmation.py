@@ -24,7 +24,7 @@ Sync confirmation
 from tkinter import Toplevel, Text
 from tkinter.ttk import Button, Label, PanedWindow, Style, Frame
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
-from foldersynclib.constantes import convert_size
+from foldersynclib.constants import convert_size
 from os import scandir
 from os.path import getsize
 

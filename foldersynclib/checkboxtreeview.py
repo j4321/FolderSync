@@ -23,7 +23,7 @@ Treeview with checkboxes at each item and a noticeable disabled style
 
 from tkinter import PhotoImage
 from tkinter.ttk import Treeview, Style
-from foldersynclib.constantes import IM_CHECKED, IM_UNCHECKED, IM_TRISTATE
+from foldersynclib.constants import IM_CHECKED, IM_UNCHECKED, IM_TRISTATE
 
 
 class CheckboxTreeview(Treeview):

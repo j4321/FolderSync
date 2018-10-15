@@ -2,7 +2,7 @@
 # -*- coding:Utf-8 -*-
 """
 FolderSync - Folder synchronization software
-Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
 
 FolderSync is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ ExclusionCopie
 from tkinter import Toplevel, Listbox, StringVar, PhotoImage
 from tkinter.ttk import Frame, Button, Style, Entry
 from foldersynclib.scrollbar import AutoScrollbar as Scrollbar
-from foldersynclib.constantes import CONFIG, IM_SUPP, IM_ADD, save_config
+from foldersynclib.constants import CONFIG, IM_SUPP, IM_ADD, save_config
 from re import split
 
 
