@@ -27,4 +27,5 @@ Run without installing
 ----------------------
 
     ::
+    
         $python3 foldersync
