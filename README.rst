@@ -21,11 +21,11 @@ Install
 
     ::
 
-        $sudo python3 setup.py install
+        $ sudo python3 setup.py install
 
 Run without installing
 ----------------------
 
     ::
     
-        $python3 foldersync
+        $ python3 foldersync
