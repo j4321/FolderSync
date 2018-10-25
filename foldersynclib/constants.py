@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-Most of the icons are modified versions of icons from the elementary project
-Copyright 2007-2013 elementary LLC, except a few I designed myself.
+Most of the other icons are modified versions of icons from the elementary project
+Copyright 2007-2013 elementary LLC (see comments next to icon paths).
 
 Constants
 """
@@ -149,20 +149,20 @@ def convert_size(size):
 # --- Images
 IMAGE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "images")
 IM_ICON = os.path.join(IMAGE_PATH, "icon.png")
-IM_ABOUT = os.path.join(IMAGE_PATH, "about.png")
+IM_SYNC = os.path.join(IMAGE_PATH, "sync.png")
 IM_COLLAPSE = os.path.join(IMAGE_PATH, "collapse_all.png")
 IM_EXPAND = os.path.join(IMAGE_PATH, "expand_all.png")
-IM_SYNC = os.path.join(IMAGE_PATH, "sync2.png")
-IM_PREV = os.path.join(IMAGE_PATH, "prev2.png")
-IM_OPEN = os.path.join(IMAGE_PATH, "open.png")
-IM_DOC = os.path.join(IMAGE_PATH, "doc.png")
-IM_PLUS = os.path.join(IMAGE_PATH, "plus_m.png")
-IM_MOINS = os.path.join(IMAGE_PATH, "moins_m.png")
-IM_ADD = os.path.join(IMAGE_PATH, "add.png")
-IM_SUPP = os.path.join(IMAGE_PATH, "supp.png")
-IM_CHECKED = os.path.join(IMAGE_PATH, "checked.png")
-IM_UNCHECKED = os.path.join(IMAGE_PATH, "unchecked.png")
-IM_TRISTATE = os.path.join(IMAGE_PATH, "tristate.png")
+IM_ABOUT = os.path.join(IMAGE_PATH, "about.png")    # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_PREV = os.path.join(IMAGE_PATH, "prev.png")      # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_OPEN = os.path.join(IMAGE_PATH, "open.png")      # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_DOC = os.path.join(IMAGE_PATH, "doc.png")        # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_PLUS = os.path.join(IMAGE_PATH, "plus_m.png")    # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_MOINS = os.path.join(IMAGE_PATH, "moins_m.png")  # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_ADD = os.path.join(IMAGE_PATH, "add.png")        # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_SUPP = os.path.join(IMAGE_PATH, "supp.png")      # modified version of an icon from the elementary project Copyright 2007-2013 elementary LLC.
+IM_CHECKED = os.path.join(IMAGE_PATH, "checked.png")      # These three checkbox icons were isolated from 
+IM_UNCHECKED = os.path.join(IMAGE_PATH, "unchecked.png")  # Checkbox States.svg (https://commons.wikimedia.org/wiki/File:Checkbox_States.svg?uselang=en)
+IM_TRISTATE = os.path.join(IMAGE_PATH, "tristate.png")    # by Marekich [CC BY-SA 3.0  (https://creativecommons.org/licenses/by-sa/3.0)]
 
 
 # --- filebrowser
