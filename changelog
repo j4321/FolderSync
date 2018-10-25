@@ -1,0 +1,14 @@
+FolderSync - Folder synchronisation software
+============================================
+Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
+
+Changelog
+---------
+
+- Version 1.0.1
+    * Fix .desktop file
+    * Fix creation of config file
+    * Improve package structure for linux
+
+- Version 1.0.0
+    * Initial release

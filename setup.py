@@ -15,7 +15,7 @@ if platform.startswith('linux'):
     data_files = [("/usr/share/locale/en_US/LC_MESSAGES/", ["foldersynclib/locale/en_US/LC_MESSAGES/FolderSync.mo"]),
                   ("/usr/share/locale/fr_FR/LC_MESSAGES/", ["foldersynclib/locale/fr_FR/LC_MESSAGES/FolderSync.mo"]),
                   ("/usr/share/foldersync/images/", images),
-                  ("/usr/share/doc/foldersync/", ["README.rst"]),
+                  ("/usr/share/doc/foldersync/", ["README.rst", 'changelog']),
                   ("/usr/share/man/man1", ["foldersync.1.gz"]),
                   ("/usr/share/pixmaps", ["foldersync.svg"]),
                   ("/usr/share/applications", ["foldersync.desktop"])]

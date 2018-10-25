@@ -1,9 +1,14 @@
 FolderSync
 ==========
 Folder synchronisation software
--------------------------------
 
-Copyright (C) 2016-2018  Juliette Monsel <j_4321@protonmail.com>
+Copyright (C) 2017-2018  Juliette Monsel <j_4321@protonmail.com>
+
+FolderSync is a utility to keep your backups up to date. You can 
+visualise the differences between your data and your backup and choose 
+what will be copied and what will be suppressed. The frequent 
+synchronisation paths can be saved as favorites.
+
 
 Prerequisite
 ------------
