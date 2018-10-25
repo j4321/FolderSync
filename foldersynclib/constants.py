@@ -37,13 +37,29 @@ from math import log, floor
 import gettext
 from webbrowser import open as webopen
 
-# --- fichier de config
-PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
+# --- paths
+PATH = os.path.dirname(__file__)
 
-PID_FILE = os.path.join(PATH, "foldersync%i.pid")
+if os.access(PATH, os.W_OK) and os.path.exists(os.path.join(PATH, "images")):
+    # the app is not installed
+    # local directory containing config files
+    LOCAL_PATH = os.path.join(PATH, "config")
+    PATH_LOCALE = os.path.join(PATH, "locale")
+    IMAGE_PATH = os.path.join(PATH, "images")
+else:
+    # local directory containing config files
+    LOCAL_PATH = os.path.join(os.path.expanduser("~"), ".foldersync")
+    PATH_LOCALE = "/usr/share/locale"
+    IMAGE_PATH = "/usr/share/foldersync/images"
 
-LOG_COPIE = os.path.join(PATH, "copie%i.log")
-LOG_SUPP = os.path.join(PATH, "suppression%i.log")
+if not os.path.isdir(LOCAL_PATH):
+    os.mkdir(LOCAL_PATH)
+
+PID_FILE = os.path.join(LOCAL_PATH, "foldersync%i.pid")
+
+# --- logs
+LOG_COPIE = os.path.join(LOCAL_PATH, "copie%i.log")
+LOG_SUPP = os.path.join(LOCAL_PATH, "suppression%i.log")
 
 
 def setup_logger(name, log_file, level=logging.INFO):
@@ -60,13 +76,11 @@ def setup_logger(name, log_file, level=logging.INFO):
 
     return logger
 
-
-PATH_CONFIG = os.path.join(PATH, "foldersync.ini")
+# --- config file
+PATH_CONFIG = os.path.join(LOCAL_PATH, "foldersync.ini")
 CONFIG = ConfigParser()
 if not os.path.exists(PATH_CONFIG):
-    if not os.path.exists(PATH):
-        os.mkdir(PATH)
-    CONFIG.add_section("Default")
+    CONFIG.add_section("Defaults")
     CONFIG.set("Defaults", "copy_links", "True")
     CONFIG.set("Defaults", "show_size", "True")
     CONFIG.set("Defaults", "exclude_copie", "")
@@ -116,15 +130,13 @@ if LANGUE not in ["en", "fr"]:
         LANGUE = "en_US"
     CONFIG.set("Defaults", "language", LANGUE[:2])
 
-try:
-	LANG = gettext.translation(APP_NAME,
-							   languages=[LANGUE])
-except FileNotFoundError:
-	# try local path
-	LANG = gettext.translation(APP_NAME,
-							   os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale"),
-							   languages=[LANGUE], fallback=True)
-LANG.install()
+gettext.bind_textdomain_codeset(APP_NAME, "UTF-8")
+gettext.bindtextdomain(APP_NAME, PATH_LOCALE)
+gettext.textdomain(APP_NAME)
+
+gettext.translation(APP_NAME, PATH_LOCALE,
+                    languages=[LANGUE],
+                    fallback=True).install()
 
 
 # --- file size
@@ -147,7 +159,6 @@ def convert_size(size):
 
 
 # --- Images
-IMAGE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "images")
 IM_ICON = os.path.join(IMAGE_PATH, "icon.png")
 IM_SYNC = os.path.join(IMAGE_PATH, "sync.png")
 IM_COLLAPSE = os.path.join(IMAGE_PATH, "collapse_all.png")
