@@ -17,6 +17,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Most of the icons are modified versions of icons from the elementary project
+Copyright 2007-2013 elementary LLC, except a few I designed myself.
+
 Constants
 """
 
