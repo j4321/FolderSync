@@ -764,6 +764,8 @@ class Sync(Tk):
                               name="suppression", args=(a_supp, ))
         process_copie.start()
         process_supp.start()
+        self.pbar_copie.configure(value=0)
+        self.pbar_supp.configure(value=0)
         self.update_pbar()
 
     def copie(self, a_copier, a_supp_avant_cp):
@@ -777,7 +779,7 @@ class Sync(Tk):
         orig = abspath(self.original) + "/"
         sauve = abspath(self.sauvegarde) + "/"
         chdir(orig)
-        self.logger_copie.info(_("Copy: %(original)s -> %(backup)s\n") % {'original': self.original, 'backup': self.sauvegarde})
+        self.logger_copie.info(_("\n###### Copy: %(original)s -> %(backup)s\n") % {'original': self.original, 'backup': self.sauvegarde})
         n = len(a_supp_avant_cp)
         self.logger_copie.info(_("Removal before copy:"))
         for i, ch in zip(range(1, n + 1), a_supp_avant_cp):
@@ -808,7 +810,7 @@ class Sync(Tk):
         ~/.foldersync/suppression.log.
         """
         self.err_supp = False
-        self.logger_supp.info(_("Removal:  %(original)s -> %(backup)s\n") % {'original': self.original, 'backup': self.sauvegarde})
+        self.logger_supp.info(_("\n###### Removal:  %(original)s -> %(backup)s\n") % {'original': self.original, 'backup': self.sauvegarde})
         for i, ch in enumerate(a_supp):
             self.logger_supp.info(ch)
             p_supp = run(["rm", "-r", ch], stderr=PIPE)
