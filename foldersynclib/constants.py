@@ -130,7 +130,7 @@ if LANGUE not in ["en", "fr"]:
         LANGUE = "en_US"
     CONFIG.set("Defaults", "language", LANGUE[:2])
 
-gettext.bind_textdomain_codeset(APP_NAME, "UTF-8")
+
 gettext.bindtextdomain(APP_NAME, PATH_LOCALE)
 gettext.textdomain(APP_NAME)
 
